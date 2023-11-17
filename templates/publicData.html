@@ -79,7 +79,20 @@
 
 
     </style>
-
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+      function search() {
+          var keyword = $('#search-input').val().toLowerCase();
+          $('table tbody tr').each(function() {
+              var rowText = $(this).text().toLowerCase();
+              if (rowText.includes(keyword)) {
+                  $(this).show();
+              } else {
+                  $(this).hide();
+              }
+          });
+      }
+  </script>
 </head>
 <body>
     <header>
@@ -102,8 +115,16 @@
     <main style="font-family: Arial">
        <center> <h2>Publicly Available Data Sets</h2></center>
 
-      
+      <p>The DCR maintains a list of sites that house publicly available data sets.  Some of these data sets are governed by data use agreements
+        while others are free to use without such agreements.  It is expected that propoer
+        ethical considerations of data use will be followed regardless of a need for
+        data use agreements </p>
 
+      <div style="aling: center;">
+          <label for="search-input">Search this page:</label>
+          <input type="text" id="search-input" oninput="search()">
+      </div>
+      
        <h3><p class="separator">Data Sets in Public Health and Medicine</p>
        </h3>
 
@@ -161,6 +182,202 @@
                   <td><a href="https://www.cdc.gov/brfss/"><b>Behavioral Risk Factor Surveillance System (BRFSS)</b></a></td>
                   <td>BRFSS collects data on health risk behaviors, chronic health conditions, and use of preventive services in the United States.  </td>
               </tr>
+
+
+            <tr>
+                <td><a href="https://www.samhsa.gov/data/data-we-collect/nsduh-national-survey-drug-use-and-health"><b>National Survey on Drug Use and Health (SAMHSA.gov)</b></a></td>
+                <td>National Survey on Drug Use and Health (NSDUH)
+                Source: Substance Abuse and Mental Health Services Administration
+                </td>
+            </tr>
+
+
+
+            <tr>
+                <td><a href="https://www.cdc.gov/nchs/nhis/index.htm"><b>Nationl Health Interview Survey (NHIS)</b></a></td>
+                <td>National Health Interview Survey (NHIS)
+                Source: Centers for Disease Control & Prevention
+                </td>
+            </tr>
+
+            <tr>
+                <td><a href="https://www.cdc.gov/healthyyouth/data/yrbs/index.htm"><b>Youth Risk Behavior Surveillance System (YRBSS)</b></a></td>
+                <td>Youth Risk Behavior Surveillance System (YRBSS)
+                  Source: Centers for Disease Control & Prevention
+                </td>
+            </tr>
+
+            <tr>
+                <td><a href="https://www.cdc.gov/healthyyouth/data/abes.htm"><b>Adolescent Behaviors and Experiences Survey (ABES)</b></a></td>
+                <td>Adolescent Behaviors and Experiences Survey (ABES)
+                  Source: Centers for Disease Control & Prevention
+                </td>
+            </tr>
+            <tr>
+            <td><a href="https://wwwn.cdc.gov/nchs/nhanes/"><b>NHANES Questionnaires and Datasets (NHANES)</b></a></td>
+                <td>National Health and Nutrition Examination Survey (NHANES)
+                  Source: Source: Centers for Disease Control & Prevention
+                </td>
+            </tr>
+            <tr>
+         <td><a href="https://hints.cancer.gov/"><b>Health Information National Trends Survey (HINTS)</b></a></td>
+             <td>Health Information National Trends Survey (HINTS)
+               Source: National Cancer Institute
+             </td>
+         </tr>
+
+
+
+
+
+
+
+
+
+
+            
+
+            <tr>
+             <td><a href="https://www.cdc.gov/nchs/dhcs/nhcs_registry_landing.htm"><b>National Health Care Survey Registry</b></a></td>
+                 <td>National Health Care Surveys Source: Centers for Disease Control & Prevention
+                 </td>
+             </tr>
+
+            <tr>
+             <td><a href="https://www.cdc.gov/nchs/ahcd/about_ahcd.htm"><b>National Ambulatory Healthcare Survey (NAMCS/NHAMCS)</b></a></td>
+                 <td>National Ambulatory Medical Care Survey (NAMCS)
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://www.cdc.gov/nchs/nhcs/index.htm"><b>National Hospital Care Survey (NHCS)</b></a></td>
+                 <td>National Hospital Care Survey (NHCS)
+                 </td>
+             </tr>
+
+            <tr>
+             <td><a href="https://www.cdc.gov/nchs/npals/index.htm"><b>National Post-acute and Long-term Care Study Homepage (NPALS)</b></a></td>
+                 <td>National Post-acute and Long-term Care Study (NPALS)
+                   Source: Center for Disease Control
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://www.cdc.gov/nchs/nehrs/about.htm"><b>National Electronic Health Records Survey (NEHRS)</b></a></td>
+                 <td>National Electronic Health Records Survey (NEHRS)
+                   Source: Center for Disease Control
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://www.cdc.gov/nchs/nsfg/"><b>National Survey of Family Growth (NSFG)</b></a></td>
+                 <td>National Survey of Family Growth (NSFG)
+                   Source: Center for Disease Control
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://www.cdc.gov/nchs/data-linkage/index.htm"><b>National Center for Health Statistics (NCHS)</b></a></td>
+                 <td>National Center for Health Statistics (NCHS)
+                   Source: Centers for Disease Control & Prevention
+                   National Center for Health Statistics
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://www.cdc.gov/nchs/data_access/vitalstatsonline.htm"><b>Vital Statistics Online</b></a></td>
+                 <td>Vital Statistics (Birth and Death datasets)
+                   Source: Centers for Disease Control & Prevention
+                   National Center for Health Statistics
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://www.icpsr.umich.edu/web/NAHDAP/series/35"><b>Monitoring the Future (MTF)</b></a></td>
+                 <td>Monitoring the Future (MTF) Public-Use Cross-Sectional Datasets
+                   Source: National Addiction & HIV Data Archive Program
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://www.cancer.gov/ccg/access-data"><b>CCG Data</b></a></td>
+                 <td>Center for Cancer Genomics (CCG) data resources
+                   Source: National Cancer Institute
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://www.cancer.gov/ccg/research/genome-sequencing/cgci"><b>CGCI Data</b></a></td>
+                 <td>Cancer Genome Characterization Initiative (CGCI)
+                   Source: National Cancer Institute
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://www.cancer.gov/ccg/research/functional-genomics/ctd2"><b>CTD2 Data</b></a></td>
+                 <td>Cancer Target Discovery and Development (CTD²) Network / C-T-D-Squared
+                   Source: National Cancer Institute
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://www.cancer.gov/ccg/research/functional-genomics/hcmi"><b>HCMI Data</b></a></td>
+                 <td>Human Cancer Models Initiative (HCMI)
+                   Source: National Cancer Institute
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://www.cancer.gov/ccg/research/genome-sequencing/tcga"><b>TCGA Program</b></a></td>
+                 <td>The Cancer Genome Atlas (TCGA)
+                   Source: National Cancer Institute
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://hcup-us.ahrq.gov/databases.jsp"><b>HCUP-US Databases</b></a></td>
+                 <td>Healthcare Cost and Utilization Project (HCUP)
+                   Source: Agency for Healthcare Research and Quality
+
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://hcup-us.ahrq.gov/nisoverview.jsp"><b>HCUP-US NIS Overview</b></a></td>
+                 <td>Healthcare Cost and Utilization Project (HCUP) National (Nationwide) Inpatient Sample (NIS)
+                   Source: Agency for Healthcare Research and Quality
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://hcup-us.ahrq.gov/db/nation/kid/kiddbdocumentation.jsp"><b>KID Database</b></a></td>
+                 <td>Kids’ Inpatient Database (KID)
+                   Source: Agency for Healthcare Research and Quality
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://hcup-us.ahrq.gov/db/nation/nass/nassdbdocumentation.jsp"><b>NASS Database</b></a></td>
+                 <td>Nationwide Ambulatory Surgery Sample (NASS)
+                   Source: Agency for Healthcare Research and Quality
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://hcup-us.ahrq.gov/db/nation/neds/nedsdbdocumentation.jsp"><b>NEDS Database</b></a></td>
+                 <td>Nationwide Emergency Department Sample (NEDS)
+                   Source: Agency for Healthcare Research and Quality
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://hcup-us.ahrq.gov/db/nation/nrd/nrddbdocumentation.jsp"><b>NRD Databse</b></a></td>
+                 <td>Nationwide Readmissions Database (NRD)
+                   Source: Agency for Healthcare Research and Quality
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://hcup-us.ahrq.gov/db/state/siddbdocumentation.jsp"><b>SID Databse</b></a></td>
+                 <td>State Inpatient Databases (SID)
+                   Source: Agency for Healthcare Research and Quality
+                 </td>
+             </tr>
+
+            <tr>
+             <td><a href="https://hcup-us.ahrq.gov/db/state/sasddbdocumentation.jsp"><b>SASD Databse</b></a></td>
+                 <td>State Ambulatory Surgery and Services Databases (SASD)
+                   Source: Agency for Healthcare Research and Quality
+                 </td>
+             </tr>
+            <tr>
+             <td><a href="https://hcup-us.ahrq.gov/db/state/sedddbdocumentation.jsp"><b>SEDD Databse</b></a></td>
+                 <td>State Emergency Department Databases (SEDD)
+                   Source: Agency for Healthcare Research and Quality
+                 </td>
+             </tr>
                    </tbody>
                </table></div>
 
