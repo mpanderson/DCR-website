@@ -79,7 +79,20 @@
 
   
   </style>
-
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+      function search() {
+          var keyword = $('#search-input').val().toLowerCase();
+          $('table tbody tr').each(function() {
+              var rowText = $(this).text().toLowerCase();
+              if (rowText.includes(keyword)) {
+                  $(this).show();
+              } else {
+                  $(this).hide();
+              }
+          });
+      }
+  </script>
 </head>
 <body>
     <header>
@@ -113,12 +126,16 @@
         methods to more novel methodologies such as missing data analysis.  The link above will
         take you to a list of these seminars, short courses, and workshops which contains links 
         to recorded trainings, workshop notes, computer code, and applicable data sets when available</p>
-      
+
+        <div style="aling: center;">
+            <label for="search-input">Search this page:</label>
+            <input type="text" id="search-input" oninput="search()">
+        </div>
       
         <h3><p class="separator"><a href="https://osctr.ouhsc.edu/Seminar%20Series">Seminars</a></p>
         </h3>
 
-       <div><table>
+       <div><table class="sortable-table">
           <thead>
               <tr>
                   <th>Topic</th>
@@ -138,19 +155,7 @@
            <!--</tr>-->
 
 
-
-
-
-              <tr>
-                  <td><b>ROC Analysis</b></a></td>
-                  <td>An Introduction to ROC Analysis in Clinical Research</a></td>
-                  <td> Not Available  </td>
-                  <td><a href="https://mediasite.ouhsc.edu/Mediasite/Play/b4816366a1af4b178c369c4f9596c0c11d"><b>Video<b></a>  </td>
-                  <td> Not Available  </td>
-                  <td> Not Available  </td>
-                  <td> Not Available  </td>
-              </tr>
-              <tr>
+                <tr>
                   <td><b>Clinical Epidemiology</b></a></td>
                   <td>An Overview of Clinical Epidemiology: Methedologic and Analytic Considerations</a></td>
                   <td> Not Available  </td>
@@ -158,8 +163,8 @@
                   <td><a href="https://osctr.ouhsc.edu/sites/default/files/2020-02/BERDSeminar05252018.pdf"> <b>Slides </b></a> </td>
                   <td> Not Available  </td>
                   <td> Not Available  </td>
-              </tr>
-              <tr>
+                </tr>
+                <tr>
                   <td><b>Directed Acyclic Graphs<b></td>
                   <td>An Introduction to the Use of Directed Acyclic Graphics (DAGs) in Epidemiologic Research</a></td>
                   <td> Not Available  </td>
@@ -167,7 +172,16 @@
                   <td><a href="https://osctr.ouhsc.edu/sites/default/files/2020-02/BERD_DAGs_Seminar_081616%20Handouts.pdf"> <b>Slides </b></a> </td>
                   <td> Not Available  </td>
                   <td> Not Available  </td>
-              </tr>
+                </tr>
+                <tr>
+                        <td><b>ROC Analysis</b></a></td>
+                        <td>An Introduction to ROC Analysis in Clinical Research</a></td>
+                        <td> Not Available  </td>
+                        <td><a href="https://mediasite.ouhsc.edu/Mediasite/Play/b4816366a1af4b178c369c4f9596c0c11d"><b>Video<b></a>  </td>
+                        <td> Not Available  </td>
+                        <td> Not Available  </td>
+                        <td> Not Available  </td>
+                  </tr>
 
 
 
@@ -179,7 +193,7 @@
                 <h3><p class="separator">Short Courses and Workshops</p>
                 </h3>
 
-               <div><table>
+               <div><table class="sortable-table">
                   <thead>
                       <tr>
                           <th>Topic</th>
@@ -199,27 +213,81 @@
                    <!--</tr>-->
 
 
+                    <tr>
 
+                        <td><a href="https://osctr.ouhsc.edu/Introduction%20to%20Bayesian%20Statistics"><b>Bayesian Analysis</b></a></td>
 
+                        <td>Introduction to Bayesian Statistical Analyses</a></td>
 
+                         <td> <a href="https://www.jpeds.com/action/showPdf?pii=S0022-3476%2818%2931707-4"> <b> Summary </b>  </td>
+
+                        <td><a href="https://mediasite.ouhsc.edu/Mediasite/Play/4ff221313fab4b40b551e91d307179e01d"> <b> Video </b> </td>
+
+                         <td><a href="https://osctr.ouhsc.edu/sites/default/files/2020-02/OSCTR%20Lecture%201%20and%202%202016%20handout.pdf"> <b>Slides </b> </td>
+
+                         <td> Not Available  </td>
+
+                         <td><a href="https://osctr.ouhsc.edu/sites/default/files/2020-02/class%20data%20short.txt"> <b>Data </b> </td>
+                    </tr>
+
+                    <tr>
+
+                        <td><a href="https://osctr.ouhsc.edu/Foundations%20of%20Biostatistics%20and%20Epidemiology"><b>Biostatistics and Epidemiology</b></a></td>
+
+                        <td>Foundations of Biostatistics and Epidemiology</a></td>
+
+                         <td> Not Available  </td>
+
+                        <td><a href="http://osctr.ouhsc.edu/sites/default/files/2020-02/TPIR%20Research%20Question%20Part%20I.mp4"> <b> Video </b> </td>
+
+                         <td><a href="http://osctr.ouhsc.edu/sites/default/files/2020-02/Module%201%20Part%20I%20Notes.pdf"> <b>Slides </b> </td>
+
+                         <td> Not Available  </td>
+                          <td> Not Available  </td>
+                    </tr>
+                 <tr>
+                      <td><a href="https://osctr.ouhsc.edu/Instrument%20Development%20and%20Psychometrics%20Workshop"><b>Instrument Development and Validation</b></a></td>
+                     <td>Developing and Validating Instruments: Basic Concepts and Application of Psychometrics</td>
+                     <td> Not Available  </td>
+                     <td><a href="https://mediasite.ouhsc.edu/Mediasite/Play/3ebfbbd5708d41beb659328974c1d39e1d"><b>Video<b></a>  </td>
+                     <td><a href="http://osctr.ouhsc.edu/sites/default/files/2020-02/Scale%20Validation%20Session2.pptx"> <b>Slides </b> </a></td>
+                     <td> Not Available  </td>
+                     <td> Not Available  </td>
+                 </tr>
+                       <tr>
+
+                           <td><a href="https://osctr.ouhsc.edu/Intro%20to%20Missing%20Data"><b>Missing Data</b></a></td>
+
+                           <td>Introduction to Missing Data Analysis</a></td>
+
+                            <td> Not Available  </td>
+
+                           <td><a href="https://mediasite.ouhsc.edu/Mediasite/Play/5ff4b2f9c99240c8aebab722cb7981121d"> <b> Video </b> </td>
+
+                             <td> Not Available  </td>
+
+                            <td> Not Available  </td>
+
+                              <td> Not Available  </td>
+
+                       </tr>
                       <tr>
-                          <td><a href="https://osctr.ouhsc.edu/REDCap%20Training"><b>REDCap Training</b></a></td>
-                          <td>An Introduction to the use of REDCap in Research</td>
-                          <td> Not Available  </td>
-                          <td><a href="https://mediasite.ouhsc.edu/Mediasite/Play/fad430e6c8494f6e96208bf37f7983131d"><b>Video<b></a>  </td>
-                           <td><a href="https://osctr.ouhsc.edu/sites/default/files/2020-02/Level101.pptx"> <b>Slides </b></a> </td>
-                          <td> Not Available  </td>
-                          <td> Not Available  </td>
+
+                          <td><a href="https://osctr.ouhsc.edu/r-short-course"><b>Propensity Score Analysis </b></a></td>
+
+                          <td>Introduction to Propensity Score Analysis</a></td>
+
+                           <td> Not Available  </td>
+
+                           <td> Not Available  </td>
+
+                            <td> Not Available  </td>
+
+                           <td> Not Available  </td>
+
+                            <td> Not Available  </td>
                       </tr>
-                      <tr>
-                           <td><a href="https://osctr.ouhsc.edu/Instrument%20Development%20and%20Psychometrics%20Workshop"><b>Instrument Development and Validation</b></a></td>
-                          <td>Developing and Validating Instruments: Basic Concepts and Application of Psychometrics</td>
-                          <td> Not Available  </td>
-                          <td><a href="https://mediasite.ouhsc.edu/Mediasite/Play/3ebfbbd5708d41beb659328974c1d39e1d"><b>Video<b></a>  </td>
-                          <td><a href="http://osctr.ouhsc.edu/sites/default/files/2020-02/Scale%20Validation%20Session2.pptx"> <b>Slides </b> </a></td>
-                          <td> Not Available  </td>
-                          <td> Not Available  </td>
-                      </tr>
+                     
                       <tr>
                            <td><a href="https://osctr.ouhsc.edu/Qualitative%20Research%20Methods"><b>Qualitative Research Methods</b></a></td>
                           <td>Introduction to Qualitative Research Methods</td>
@@ -238,6 +306,15 @@
                            <td> Not Available  </td>
                            <td> Not Available  </td>
                        </tr>
+                 <tr>
+                     <td><a href="https://osctr.ouhsc.edu/REDCap%20Training"><b>REDCap Training</b></a></td>
+                     <td>An Introduction to the use of REDCap in Research</td>
+                     <td> Not Available  </td>
+                     <td><a href="https://mediasite.ouhsc.edu/Mediasite/Play/fad430e6c8494f6e96208bf37f7983131d"><b>Video<b></a>  </td>
+                      <td><a href="https://osctr.ouhsc.edu/sites/default/files/2020-02/Level101.pptx"> <b>Slides </b></a> </td>
+                     <td> Not Available  </td>
+                     <td> Not Available  </td>
+                 </tr>
                            <tr>
                                 <td><a href="https://osctr.ouhsc.edu/r-short-course"><b>R Short Course 1</b></a></td>
                                <td>Introduction to R</td>
@@ -264,73 +341,11 @@
 
                                  <td><a href="https://octsi.ouhsc.edu/sites/default/files/2021-04/Topic%206%20dat.csv"> <b>Data </b> </td>
                             </tr>
-                             <tr>
-
-                                <td><a href="https://osctr.ouhsc.edu/r-short-course"><b>Propensity Score Analysis </b></a></td>
-
-                                <td>Introduction to Propensity Score Analysis</a></td>
-
-                                 <td> Not Available  </td>
-
-                                 <td> Not Available  </td>
-
-                                  <td> Not Available  </td>
-
-                                 <td> Not Available  </td>
-
-                                  <td> Not Available  </td>
-                            </tr>
-                            <tr>
-
-                                <td><a href="https://osctr.ouhsc.edu/Foundations%20of%20Biostatistics%20and%20Epidemiology"><b>Biostatistics and Epidemiology</b></a></td>
-
-                                <td>Foundations of Biostatistics and Epidemiology</a></td>
-
-                                 <td> Not Available  </td>
-
-                                <td><a href="http://osctr.ouhsc.edu/sites/default/files/2020-02/TPIR%20Research%20Question%20Part%20I.mp4"> <b> Video </b> </td>
-
-                                 <td><a href="http://osctr.ouhsc.edu/sites/default/files/2020-02/Module%201%20Part%20I%20Notes.pdf"> <b>Slides </b> </td>
-
-                                 <td> Not Available  </td>
-                                  <td> Not Available  </td>
-                            </tr>
-
-                              <tr>
-
-                                <td><a href="https://osctr.ouhsc.edu/Introduction%20to%20Bayesian%20Statistics"><b>Bayesian Analysis</b></a></td>
-
-                                <td>Introduction to Bayesian Statistical Analyses</a></td>
-
-                                 <td> <a href="https://www.jpeds.com/action/showPdf?pii=S0022-3476%2818%2931707-4"> <b> Summary </b>  </td>
-
-                                <td><a href="https://mediasite.ouhsc.edu/Mediasite/Play/4ff221313fab4b40b551e91d307179e01d"> <b> Video </b> </td>
-
-                                 <td><a href="https://osctr.ouhsc.edu/sites/default/files/2020-02/OSCTR%20Lecture%201%20and%202%202016%20handout.pdf"> <b>Slides </b> </td>
-
-                                 <td> Not Available  </td>
-
-                                 <td><a href="https://osctr.ouhsc.edu/sites/default/files/2020-02/class%20data%20short.txt"> <b>Data </b> </td>
-                            </tr>
+                            
+                            
 
                                
-                            <tr>
-
-                                <td><a href="https://osctr.ouhsc.edu/Intro%20to%20Missing%20Data"><b>Missing Data</b></a></td>
-
-                                <td>Introduction to Missing Data Analysis</a></td>
-
-                                 <td> Not Available  </td>
-
-                                <td><a href="https://mediasite.ouhsc.edu/Mediasite/Play/5ff4b2f9c99240c8aebab722cb7981121d"> <b> Video </b> </td>
-
-                                  <td> Not Available  </td>
-
-                                 <td> Not Available  </td>
-
-                                   <td> Not Available  </td>
-
-                            </tr>
+                            
 
 
 
@@ -359,5 +374,47 @@
                       }
                     }
                     </script>
+
+                          <script>
+                              // Function to sort the table rows based on the text after the <b> tag in the first column
+                              function sortTable(table) {
+                                  var rows, switching, i, x, y, shouldSwitch;
+                                  switching = true;
+
+                                  while (switching) {
+                                      switching = false;
+                                      rows = table.rows;
+
+                                      for (i = 1; i < (rows.length - 1); i++) {
+                                          shouldSwitch = false;
+                                          x = rows[i].getElementsByTagName("TD")[0];
+                                          y = rows[i + 1].getElementsByTagName("TD")[0];
+
+                                          // Extract text content after <b> tag for comparison
+                                          var xText = x.getElementsByTagName("B")[0].innerText.toLowerCase();
+                                          var yText = y.getElementsByTagName("B")[0].innerText.toLowerCase();
+
+                                          if (xText > yText) {
+                                              shouldSwitch = true;
+                                              break;
+                                          }
+                                      }
+
+                                      if (shouldSwitch) {
+                                          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                                          switching = true;
+                                      }
+                                  }
+                              }
+
+                              // Call the sortTable function for all tables when the page is loaded
+                              window.onload = function () {
+                                  var tables = document.getElementsByClassName("sortable-table");
+
+                                  for (var i = 0; i < tables.length; i++) {
+                                      sortTable(tables[i]);
+                                  }
+                              };
+                          </script>
 </body>
 </html>

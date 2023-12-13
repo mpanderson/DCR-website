@@ -131,7 +131,7 @@
        <b>May require use agreements.</b> These data sets are publicly available but may be subject to specific terms of use and data access requirements.  For example, you many need to submit a data request form to obtain access to the data
 
 
-       <div><table>
+       <div><table class="sortable-table">
           <thead>
               <tr>
                   <th>Data</th>
@@ -225,17 +225,6 @@
                Source: National Cancer Institute
              </td>
          </tr>
-
-
-
-
-
-
-
-
-
-
-            
 
             <tr>
              <td><a href="https://www.cdc.gov/nchs/dhcs/nhcs_registry_landing.htm"><b>National Health Care Survey Registry</b></a></td>
@@ -384,7 +373,7 @@
         <p class="separator"><b>Do NOT require use agreements</b> Although these may not have strict use requirements you should always check the specific terms of use and licensing associated with each dataset you intend to use to ensure compliance.
         </p>
 
-        <div><table>
+        <div><table class="sortable-table">
            <thead>
                <tr>
                    <th>Data</th>
@@ -466,7 +455,7 @@
           </h3>
 
 
-          <div><table>
+          <div><table class="sortable-table">
              <thead>
                  <tr>
                      <th>Data</th>
@@ -511,7 +500,7 @@
          <h3><p class="separator">Data Sets in Python Modules</p>
          </h3>
 
-                <div><table>
+                <div><table class="sortable-table">
                    <thead>
                        <tr>
                            <th>Data</th>
@@ -549,6 +538,49 @@
       }
     }
     </script>
+
+
+  <script>
+      // Function to sort the table rows based on the text after the <b> tag in the first column
+      function sortTable(table) {
+          var rows, switching, i, x, y, shouldSwitch;
+          switching = true;
+
+          while (switching) {
+              switching = false;
+              rows = table.rows;
+
+              for (i = 1; i < (rows.length - 1); i++) {
+                  shouldSwitch = false;
+                  x = rows[i].getElementsByTagName("TD")[0];
+                  y = rows[i + 1].getElementsByTagName("TD")[0];
+
+                  // Extract text content after <b> tag for comparison
+                  var xText = x.getElementsByTagName("B")[0].innerText.toLowerCase();
+                  var yText = y.getElementsByTagName("B")[0].innerText.toLowerCase();
+
+                  if (xText > yText) {
+                      shouldSwitch = true;
+                      break;
+                  }
+              }
+
+              if (shouldSwitch) {
+                  rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                  switching = true;
+              }
+          }
+      }
+
+      // Call the sortTable function for all tables when the page is loaded
+      window.onload = function () {
+          var tables = document.getElementsByClassName("sortable-table");
+
+          for (var i = 0; i < tables.length; i++) {
+              sortTable(tables[i]);
+          }
+      };
+  </script>
   
 </body>
 </html>
