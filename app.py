@@ -21,5 +21,9 @@ def datapage():
 def workshoppage():
     return render_template('workshops.html')
 
+@app.route('/tutorials')
+def tutorialpage():
+    return render_template('tutorials.html')
+
 if __name__ == '__main__':
     app.run('0.0.0.0',debug=True)
