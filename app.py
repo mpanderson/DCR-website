@@ -17,6 +17,18 @@ def homepage():
 def datapage():
     return render_template('publicData.html')
 
+@app.route('/analysisExamps')
+def analysispage():
+    return render_template('analysisExamps.html')
+
+@app.route('/powerExamps')
+def powerpage():
+    return render_template('powerExamps.html')
+  
+@app.route('/softTrain')
+def softwarepage():
+    return render_template('softwareTrain.html')
+
 @app.route('/workshops')
 def workshoppage():
     return render_template('workshops.html')
