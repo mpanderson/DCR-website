@@ -37,5 +37,21 @@ def workshoppage():
 def tutorialpage():
     return render_template('tutorials.html')
 
+@app.route('/tools')
+def toolspage():
+    return render_template('tools.html')
+
+@app.route('/distributions')
+def distnpage():
+    return render_template('distributions.html')
+
+@app.route('/sampleSizeCalculations')
+def sampleSizepage():
+    return render_template('sampleSizeCalculations.html')
+
+@app.route('/randomizations')
+def randomizationspage():
+    return render_template('randomizations.html')
+
 if __name__ == '__main__':
     app.run('0.0.0.0',debug=True)
