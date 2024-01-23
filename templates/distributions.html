@@ -1,119 +1,7 @@
-<!docTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Distributions</title>
-   <style>
-     .banner {
-             background-color: #003366; /* Change to your desired background color */
-             color: #fff; /* Text color */
-             padding: 20px;
-             text-align: center;
-         }
+{% extends "base.html"%}
+{% block title%}Distributions{%endblock%}
 
-          .separator {
-             margin-top: 1cm;
-         }
-          main {
-             margin: .75in;
-             padding: 0;
-         }
-          table {
-             width: 100%;
-             border-collapse: collapse;
-         }
-
-         th, td {
-             border: 1px solid #ccc;
-             padding: 8px;
-             text-align: left;
-         }
-
-         th {
-             background-color: #f2f2f2;
-         }
-         .table-container{
-             margin-left: 0.75in;
-             margin-right: 0.75in;
-         }
-
-      #navbar {
-        overflow: hidden;
-        background-color: #333;
-      }
-
-      #navbar a {
-        float: left;
-        display: block;
-        color: #f2f2f2;
-        text-align: center;
-        padding: 14px 16px;
-        text-decoration: none;
-        font-size: 17px;
-      }
-
-      #navbar a:hover {
-        background-color: #ddd;
-        color: black;
-      }
-
-      #navbar a.active {
-        background-color: #003366;
-        color: white;
-      }
-
-      .content {
-        padding: 16px;
-      }
-
-      .sticky {
-        position: fixed;
-        top: 0;
-        width: 100%;
-      }
-
-      .sticky + .content {
-        padding-top: 60px;
-      }
-
-
-    </style>
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <script>
-      function search() {
-          var keyword = $('#search-input').val().toLowerCase();
-          $('table tbody tr').each(function() {
-              var rowText = $(this).text().toLowerCase();
-              if (rowText.includes(keyword)) {
-                  $(this).show();
-              } else {
-                  $(this).hide();
-              }
-          });
-      }
-  </script>
-</head>
-<body>
-    <header>
-        <div class="banner">
-        <center><h1>BERD Design and Computational Resources Unit</h1>
-        <nav>
-
-        </nav></center></div>
-    </header>
-
-  <div id="navbar" style="font-family: Arial">
-    <a class="active" href="/">Home</a>
-    <a href="publicData">Data Sets</a>
-    <a href="analysisExamps">Data Analysis Examples</a>
-    <a href="powerExamps">Power Analysis Examples</a>
-    <a href="workshops">Seminars and Workshops</a>
-    <a href="softTrain">Software Training</a>
-    <a href="tutorials">Tutorials</a>
-    <a href="tools">Tools</a>
-     <a href="https://redcap.ouhsc.edu/redcap/surveys/?s=u8Tipfbiwk">Request Form</a>
-  </div>
+{% block content %}
 
     <main style="font-family: Arial">
        <center> <h2>Distributions</h2></center>
@@ -127,44 +15,333 @@
 
       <h3><p class="separator"><a >Distributions</a></p>
       </h3>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       
+      <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 
+      <body1>
+        
+        <div class="chartContainer">
+            <div style="align-content: inline-flex;">
+                <h3>Normal Distribution</h3>
+                <label for="meanInput">Mean:</label>
+                <input type="number" id="meanInput" step="0.1" value="0" style="width: 80px">
+                <label for="stdDevInput">Standard Deviation:</label>
+                <input type="number" id="stdDevInput" step="0.1" value="1" min="0.001" style="width: 80px">
 
-
+              
+            
+                 <!-- Radio buttons for Compute Area and Compute Percentile options -->
+                <div>
+                    <input type="radio" id="computeArea" name="computeOption" value="area">
+                    <label for="computeArea">Compute Area</label>
       
-</body>
-</html>
+                    <input type="radio" id="computePercentile" name="computeOption" value="percentile">
+                    <label for="computePercentile">Compute Percentile</label>
+                </div>
+
+                <!-- Table for Compute Area options -->
+                <table id="areaOptions" style="display: none;">
+                    <tr>
+                        <td><input type="radio" id="greaterThan" name="areaOption" value="greaterThan" checked></td>
+                        <td>Greater than z-score:</td>
+                        <td><input type="number" id="zScoreGreaterThan" step="0.1" value="0"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="radio" id="greaterThanOrEqual" name="areaOption" value="greaterThanOrEqual"></td>
+                        <td>Greater than or equal to z-score:</td>
+                        <td><input type="number" id="zScoreGreaterThanOrEqual" step="0.1" value="0"></td>
+                    </tr>
+                    <tr>
+                        <!-- Add more rows for other options -->
+                    </tr>
+                </table>
+              </div>
+            <canvas id="myChartNorm"></canvas>
+        </div>
+
+        <script>
+            function createChartNorm() {
+                const ctxNorm = document.getElementById('myChartNorm').getContext('2d');
+                const myChartNorm = new Chart(ctxNorm, {
+                    type: 'line',
+                    data: {
+                        labels: [],
+                        datasets: [{
+                            label: 'Normal Distribution',
+                            data: [],
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            fill: false,
+                            pointRadius: [0]  // Hide default points
+                        }, {
+                            label: '95% Interval',
+                            data: [],
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            fill: true,
+                            pointRadius: [0]  // Hide default points
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                position: 'bottom'
+                            },
+                            y: {
+                                type: 'linear',
+                                position: 'left'
+                            }
+                        }
+                    }
+                });
+                return myChartNorm;
+            }
+
+            // Create the chart instance
+            const myChartNorm = createChartNorm();
+
+            
+
+            // Set up listeners for input changes
+            meanInput.addEventListener('input', updateChartNorm);
+            stdDevInput.addEventListener('input', updateChartNorm);
+
+            // Initial chart creation (using default values)
+            updateChartNorm();
+        </script>
+        <script>
+          function normalDistribution(mu, sd, x) {
+               return jStat.normal.pdf(x, mu, sd);
+           }
+
+           function generateSequenceNorm(mu, sd, numPoints) {
+               const sequence = [];
+               const lowerBound = mu - 4 * sd;
+               const upperBound = mu + 4 * sd;
+               const step = (upperBound - lowerBound) / (numPoints - 1);
+
+               for (let i = 0; i < numPoints; i++) {
+                   const value = lowerBound + i * step;
+                   sequence.push(value);
+               }
+
+               return sequence;
+           }
+
+           function updateChartNorm() {
+               const meanInput = document.getElementById('meanInput');
+               const stdDevInput = document.getElementById('stdDevInput');
+
+             const computeAreaRadio = document.getElementById('computeArea');
+             const computePercentileRadio = document.getElementById('computePercentile');
+
+             const areaOptionsTable = document.getElementById('areaOptions');
+
+
+             let mean = parseFloat(meanInput.value) || 0;
+             let standardDeviation = Math.max(parseFloat(stdDevInput.value), 0.001) || 0.001;
+
+             // Ensure that stdDev is not below 0.001
+               standardDeviation = Math.max(standardDeviation, 0.001);
+
+             // Check which radio button is selected
+             if (computeAreaRadio.checked) {
+                 // Compute Area option is selected
+                 areaOptionsTable.style.display = 'table';  // Show the table of options
+                 // ... (your logic for computing area based on selected options and input values)
+             } else {
+                 // Hide the table if Compute Area is not selected
+                 areaOptionsTable.style.display = 'none';
+                 // ... (your logic for other options)
+             }
+
+               const generatedSequenceNorm = generateSequenceNorm(mean, standardDeviation, 100);
+               const distributionValuesNorm = generatedSequenceNorm.map(x => normalDistribution(mean, standardDeviation, x));
+
+               const lowerPercentile = jStat.normal.inv(0.025, mean, standardDeviation);
+               const upperPercentile = jStat.normal.inv(0.975, mean, standardDeviation);
+
+               // Add points at 2.5th and 97.5th percentiles
+               const confidenceIntervalPoints = [
+                   { x: lowerPercentile, y: normalDistribution(mean, standardDeviation, lowerPercentile) },
+                   { x: upperPercentile, y: normalDistribution(mean, standardDeviation, upperPercentile) }
+               ];
+
+               // Filter values between lowerPercentile and upperPercentile
+               const valuesInRange = distributionValuesNorm.filter(value => value >= lowerPercentile && value <= upperPercentile);
+
+               myChartNorm.data.labels = generatedSequenceNorm.map(x => x.toFixed(2));
+               myChartNorm.data.datasets[0].data = distributionValuesNorm;
+               myChartNorm.data.datasets[0].pointRadius = [0];  // Hide default points
+               myChartNorm.data.datasets[0].pointBackgroundColor = ['red', 'red'];  // Color for confidence interval points
+               myChartNorm.data.datasets[0].pointBorderColor = ['red', 'red'];  // Border color for confidence interval points
+               myChartNorm.data.datasets[0].pointStyle = ['circle', 'circle'];  // Style for confidence interval points
+               myChartNorm.data.datasets[1] = {
+                   label: '95% Confidence Interval',
+                   data: confidenceIntervalPoints,
+                   pointRadius: [6, 6],  // Size of confidence interval points
+                   pointBackgroundColor: ['red', 'red'],
+                   pointBorderColor: ['red', 'red'],
+                   pointStyle: ['circle', 'circle'],
+                   showLine: false
+               };
+
+               myChartNorm.update();
+           }
+
+           const meanInput = document.getElementById('meanInput');
+           const stdDevInput = document.getElementById('stdDevInput');
+
+           meanInput.addEventListener('input', updateChartNorm);
+           stdDevInput.addEventListener('input', updateChartNorm);
+
+          // Set up listeners for radio button changes
+          document.getElementById('computeArea').addEventListener('change', updateChartNorm);
+          document.getElementById('computePercentile').addEventListener('change', updateChartNorm);
+
+          // Set up listeners for area option changes
+          document.querySelectorAll('input[name="areaOption"]').forEach(option => {
+              option.addEventListener('change', updateChartNorm);
+          });
+
+           const generatedSequenceNorm = generateSequenceNorm(0, 1, 100);
+           const distributionValuesNorm = generatedSequenceNorm.map(x => normalDistribution(0, 1, x));
+
+           const lowerPercentile = jStat.normal.inv(0.025, 0, 1);
+           const upperPercentile = jStat.normal.inv(0.975, 0, 1);
+
+           // Add points at 2.5th and 97.5th percentiles
+           const confidenceIntervalPoints = [
+               { x: lowerPercentile, y: normalDistribution(0, 1, lowerPercentile) },
+               { x: upperPercentile, y: normalDistribution(0, 1, upperPercentile) }
+           ];
+
+           // Filter values between lowerPercentile and upperPercentile
+           const valuesInRange = distributionValuesNorm.filter(value => value >= lowerPercentile && value <= upperPercentile);
+
+            function createChartNorm() {
+               const ctxNorm = document.getElementById('myChartNorm').getContext('2d');
+               const myChartNorm = new Chart(ctxNorm, {
+                   type: 'line',
+                   data: {
+                       labels: generatedSequenceNorm.map(x => x.toFixed(2)),
+                       datasets: [{
+                           label: 'Normal Distribution',
+                           data: distributionValuesNorm,
+                           borderColor: 'rgba(75, 192, 192, 1)',
+                           fill: false,
+                           pointRadius: [0]  // Hide default points
+                       },{
+                          label: '95% Interval',
+                          data: valuesInRange,
+                          borderColor: 'rgba(75, 192, 192, 1)',
+                          fill: true,
+                          pointRadius: [0]  // Hide default points
+                        }]
+                   },
+                   options: {
+                       scales: {
+                           x: {
+                               type: 'linear',
+                               position: 'bottom'
+                           },
+                           y: {
+                               type: 'linear',
+                               position: 'left'
+                           }
+                       }
+                   }
+               });
+              return myChartNorm;
+            }
+           // Initial chart creation (using default values)
+           updateChartNorm();
+
+
+        </script>
+      </body1>
+
+
+
+    
+
+      <body3>
+        <div class="chartContainer">
+          <div style="align-content: inline-flex;">
+             <h3>Exponential Distribution</h3>
+            <label for="expBetaInput">Beta (scale):</label>
+            <input type="number" id="expBetaInput" step="0.1" value="1" min="0.001" style="width: 80px">
+          </div>
+          <canvas id="myChartExp"></canvas>
+        </div>
+      </body3>
+
+      <body5>
+        <div class="chartContainer">
+          <div style="align-content: inline-flex;">
+            <h3>Beta Distribution</h3>
+            <label for="betaAlphaInput">Alpha:</label>
+            <input type="number" id="betaAlphaInput" step="0.1" value="1" min="0.001" style="width: 80px">
+            <label for="betaBetaInput">Beta:</label>
+            <input type="number" id="betaBetaInput" step="0.1" value="1" min="0.001" style="width: 80px">
+          </div>
+          <canvas id="myChartBeta"></canvas>
+        </div>
+      </body5>
+
+      <body4>
+        <div class="chartContainer">
+          <div style="align-content: inline-flex;">
+             <h3>Gamma Distribution</h3>
+            <label for="gamAlphaInput">Alpha:</label>
+            <input type="number" id="gamAlphaInput" step="0.1" value="1" min="0.001" style="width: 80px">
+            <label for="gamBetaInput">Beta (scale):</label>
+            <input type="number" id="gamBetaInput" step="0.1" value="1" min="0.001" style="width: 80px">
+          </div>
+          <canvas id="myChartGam"></canvas>
+        </div>
+      </body4>
+
+      <body6>
+        <div class="chartContainer">
+          <div style="align-content: inline-flex;">
+             <h3>Uniform Distribution</h3>
+            <label for="unifLowerInput">a:</label>
+            <input type="number" id="unifLowerInput" step="0.1" value="0" style="width: 80px">
+            <label for="unifUpperInput">b:</label>
+            <input type="number" id="unifUpperInput" step="0.1" value="1" style="width: 80px">
+          </div>
+          <canvas id="myChartUnif"></canvas>
+        </div>
+      </body6>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   {% endblock %}

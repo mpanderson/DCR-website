@@ -5,9 +5,10 @@ Created on Mon Sep  4 06:47:21 2023
 @author: mpand
 """
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request, session 
 
-app = Flask(__name__)
+
+app = Flask(__name__, static_folder="static")
 
 @app.route('/')
 def homepage():
@@ -41,7 +42,8 @@ def tutorialpage():
 def toolspage():
     return render_template('tools.html')
 
-@app.route('/distributions')
+
+@app.route('/distributions', methods=['GET', 'POST'])
 def distnpage():
     return render_template('distributions.html')
 
