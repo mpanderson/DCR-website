@@ -42,24 +42,182 @@
                 </div>
 
                 <!-- Table for Compute Area options -->
-                <table id="areaOptions" style="display: none;">
-                    <tr>
-                        <td><input type="radio" id="greaterThan" name="areaOption" value="greaterThan" checked></td>
-                        <td>Greater than z-score:</td>
-                        <td><input type="number" id="zScoreGreaterThan" step="0.1" value="0"></td>
-                    </tr>
-                    <tr>
-                        <td><input type="radio" id="greaterThanOrEqual" name="areaOption" value="greaterThanOrEqual"></td>
-                        <td>Greater than or equal to z-score:</td>
-                        <td><input type="number" id="zScoreGreaterThanOrEqual" step="0.1" value="0"></td>
-                    </tr>
-                    <tr>
-                        <!-- Add more rows for other options -->
-                    </tr>
-                </table>
+              <!-- Table for Compute Area options -->
+              <table id="areaOptions" style="display: none; width: 50%;">
+                  <tr>
+                      <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="greaterThan" name="areaOption" value="greaterThan" checked></td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;">greater than</td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="zScoreGreaterThan" step="0.1" value="0"></td>
+                     <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
+                     <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedAreaGreaterThan"></span></td>
+                  </tr>
+                
+                  <!-- Repeat the same pattern for other rows -->
+                  <tr>
+                      <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="lessThan" name="areaOption" value="lessThan"></td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;">less than</td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="zScoreLessThan" step="0.1" value="0"></td>
+                     <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                     <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedAreaLessThan"></span></td>
+                  </tr>
+                  <!-- Repeat the same pattern for other rows -->
+                  
+                <tr>
+                    <td style="border: none; padding: 0px 0px 0px 100px;">
+                        <input type="radio" id="greaterThanB" name="areaOption" value="greaterThanB">
+                    </td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">greater than</td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">
+                        <input style="width: 80px" type="number" id="zScoreGreaterThanB" step="0.1" value="0">
+                    </td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">and less than</td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">
+                        <input style="width: 80px" type="number" id="zScoreLessThanB" step="0.1" value="0">
+                    </td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">
+                        <span id="computedAreaGreaterThanB"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="border: none; padding: 0px 0px 0px 100px;">
+                        <input type="radio" id="lessThanT" name="areaOption" value="lessThanT">
+                    </td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">less than</td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">
+                        <input style="width: 80px" type="number" id="zScoreLessThanT" step="0.1" value="0">
+                    </td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">and greater than</td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">
+                        <input style="width: 80px" type="number" id="zScoreGreaterThanT" step="0.1" value="0">
+                    </td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">
+                        <span id="computedAreaLessThanT"></span>
+                    </td>
+                </tr>
+                  <!-- Add more rows for other options -->
+              </table>
               </div>
-            <canvas id="myChartNorm"></canvas>
+            <canvas id="myChartNorm" style="width: 30%; height: 30%;"></canvas>
         </div>
+
+
+        
+        <!-- Include jStat.js library -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.7.1/jstat.min.js"></script>
+
+        <script>
+          // Function to compute area under the normal distribution curve
+          function computeNormalDistributionArea(mean, stdDev, zScore) {
+            // Using jStat library to compute the cumulative distribution function (CDF)
+            return jStat.normal.cdf(zScore, mean, stdDev);
+          }
+
+          // Function to update all computed areas based on current mean and stdDev
+          function updateAllComputedAreas() {
+            // Get user inputs
+            var mean = parseFloat(document.getElementById("meanInput").value);
+            var stdDev = parseFloat(document.getElementById("stdDevInput").value);
+
+            // Update computed areas for all radio button options
+            var radioOptions = document.getElementsByName("areaOption");
+
+            for (var i = 0; i < radioOptions.length; i++) {
+              var selectedRadio = radioOptions[i].value;
+              var computedAreaElement = document.getElementById("computedArea" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1));
+
+              if (computedAreaElement) {
+                var zScore;
+                var computedArea;
+
+                // Handle special cases for "greaterThan" and "greaterThanOrEqual"
+                if (selectedRadio === "greaterThan" || selectedRadio === "greaterThanOrEqual") {
+                  zScore = parseFloat(document.getElementById("zScore" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1)).value);
+                  computedArea = computeNormalDistributionArea(mean, stdDev, zScore);
+
+                  // Adjust the computed area for "greaterThan" and "greaterThanOrEqual" options
+                  if (selectedRadio === "greaterThan" || selectedRadio === "greaterThanOrEqual") {
+                    computedArea = 1 - computedArea;
+                  }
+                  
+                }
+                  // Handle special case for "greaterThanB"
+                  else if (selectedRadio === "greaterThanB") {
+                    console.log("Handling greaterThanB");
+                    var zScoreGreaterThanB = parseFloat(document.getElementById("zScoreGreaterThanB").value);
+                    var zScoreLessThanB = parseFloat(document.getElementById("zScoreLessThanB").value);
+
+                    // Find the min and max values
+                    var minZScore = Math.min(zScoreGreaterThanB, zScoreLessThanB);
+                    var maxZScore = Math.max(zScoreGreaterThanB, zScoreLessThanB);
+
+                    
+                    computedArea = computeNormalDistributionArea(mean, stdDev, maxZScore) - computeNormalDistributionArea(mean, stdDev, minZScore);
+                    computedAreaElement = document.getElementById("computedAreaGreaterThanB"); // Corrected ID
+                    console.log(computedArea);
+                    console.log(computedAreaElement);
+                  }
+
+                  // Handle special case for "lessThanT"
+                  else if (selectedRadio === "lessThanT") {
+                    console.log("Handling lessThanT");
+                    var zScoreLessThanT = parseFloat(document.getElementById("zScoreLessThanT").value);
+                    var zScoreGreaterThanT = parseFloat(document.getElementById("zScoreGreaterThanT").value);
+
+                    // Find the min and max values
+                    var minZScore = Math.min(zScoreLessThanT, zScoreGreaterThanT);
+                    var maxZScore = Math.max(zScoreLessThanT, zScoreGreaterThanT);
+
+                    
+                    computedArea = computeNormalDistributionArea(mean, stdDev, minZScore) + (1 - computeNormalDistributionArea(mean, stdDev, maxZScore));
+                    computedAreaElement = document.getElementById("computedAreaLessThanT"); // Corrected ID
+                    console.log(computedArea);
+                    console.log(computedAreaElement);
+                  }
+                // Handle other cases
+                else {
+                  zScore = parseFloat(document.getElementById("zScore" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1)).value);
+                  computedArea = computeNormalDistributionArea(mean, stdDev, zScore);
+                }
+
+                computedAreaElement.textContent = computedArea.toFixed(4); // Adjust the decimal places as needed
+              }
+            }
+          }
+
+          // Attach event listeners to radio buttons
+          var radioOptions = document.getElementsByName("areaOption");
+          for (var i = 0; i < radioOptions.length; i++) {
+            radioOptions[i].addEventListener("change", updateAllComputedAreas);
+          }
+
+          // Attach event listener to zScore input elements
+          var zScoreInputs = document.querySelectorAll('[id^="zScore"]');
+          for (var i = 0; i < zScoreInputs.length; i++) {
+            zScoreInputs[i].addEventListener("input", updateAllComputedAreas);
+          }
+
+          // Attach event listener to mean and stdDev input elements
+          var meanInput1 = document.getElementById("meanInput");
+          var stdDevInput1 = document.getElementById("stdDevInput");
+
+          meanInput1.addEventListener("input", updateAllComputedAreas);
+          stdDevInput1.addEventListener("input", updateAllComputedAreas);
+
+          // Initial update when the page loads
+          updateAllComputedAreas();
+        </script>
+
+
+
+
+
+
 
         <script>
             function createChartNorm() {
@@ -220,41 +378,7 @@
            // Filter values between lowerPercentile and upperPercentile
            const valuesInRange = distributionValuesNorm.filter(value => value >= lowerPercentile && value <= upperPercentile);
 
-            function createChartNorm() {
-               const ctxNorm = document.getElementById('myChartNorm').getContext('2d');
-               const myChartNorm = new Chart(ctxNorm, {
-                   type: 'line',
-                   data: {
-                       labels: generatedSequenceNorm.map(x => x.toFixed(2)),
-                       datasets: [{
-                           label: 'Normal Distribution',
-                           data: distributionValuesNorm,
-                           borderColor: 'rgba(75, 192, 192, 1)',
-                           fill: false,
-                           pointRadius: [0]  // Hide default points
-                       },{
-                          label: '95% Interval',
-                          data: valuesInRange,
-                          borderColor: 'rgba(75, 192, 192, 1)',
-                          fill: true,
-                          pointRadius: [0]  // Hide default points
-                        }]
-                   },
-                   options: {
-                       scales: {
-                           x: {
-                               type: 'linear',
-                               position: 'bottom'
-                           },
-                           y: {
-                               type: 'linear',
-                               position: 'left'
-                           }
-                       }
-                   }
-               });
-              return myChartNorm;
-            }
+          
            // Initial chart creation (using default values)
            updateChartNorm();
 
