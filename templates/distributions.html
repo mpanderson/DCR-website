@@ -447,7 +447,7 @@
                  // ... (your logic for other options)
              }
 
-               const generatedSequenceNorm = generateSequenceNorm(mean, standardDeviation, 100);
+               const generatedSequenceNorm = generateSequenceNorm(mean, standardDeviation, 1000);
                const distributionValuesNorm = generatedSequenceNorm.map(x => normalDistribution(mean, standardDeviation, x));
 
                const lowerPercentile = jStat.normal.inv(0.025, mean, standardDeviation);
@@ -477,10 +477,108 @@
                    pointStyle: ['circle', 'circle'],
                    showLine: false
                };
+             myChartNorm.data.datasets[2] = {
+                  label: 'Area',
+                  data: confidenceIntervalPoints,
+                  showLine: false
+              };
 
+             // Get the selected radio button for area computation
+             const selectedRadio = document.querySelector('input[name="areaOption"]:checked');
+
+             // Get the zScore input values
+             const zScoreInput = document.getElementById('zScoreGreaterThan');
+             const zScore = parseFloat(zScoreInput.value) || 0;
+
+             const zScore2Input = document.getElementById('zScoreLessThan');
+             const zScore2 = parseFloat(zScore2Input.value) || 0;
+
+             const zScoreGreaterThanBInput = document.getElementById('zScoreGreaterThanB');
+             const zScoreGreaterThanB = parseFloat(zScoreGreaterThanBInput.value) || 0;
+
+             const zScoreLessThanBInput = document.getElementById('zScoreLessThanB');
+             const zScoreLessThanB = parseFloat(zScoreLessThanBInput.value) || 0;
+
+             const zScoreLessThanTInput = document.getElementById('zScoreLessThanT');
+             const zScoreLessThanT = parseFloat(zScoreLessThanTInput.value) || 0;
+
+             const zScoreGreaterThanTInput = document.getElementById('zScoreGreaterThanT');
+             const zScoreGreaterThanT = parseFloat(zScoreGreaterThanTInput.value) || 0;
+
+             // Compute lower and upper bounds based on the selected radio button
+             let lowerBound, upperBound, lowerBound2, upperBound2;
+                 if (computeAreaRadio.checked) {
+                     if (selectedRadio) {
+                         const radioValue = selectedRadio.value;
+        
+                         if (radioValue === 'greaterThan') {
+                             lowerBound = zScore;
+                             upperBound = Infinity;
+                         } else if (radioValue === 'lessThan') {
+                             lowerBound = -Infinity;
+                             upperBound = zScore2;
+                         } else if (radioValue === 'greaterThanB') {
+                             lowerBound = zScoreGreaterThanB;
+                             upperBound = zScoreLessThanB;
+                         } else if (radioValue === 'lessThanT') {
+                             lowerBound = -Infinity;
+                             upperBound = zScoreLessThanT;
+                           lowerBound2 = zScoreGreaterThanT;
+                            upperBound2 = Infinity;
+                         } else {
+                             // Handle other cases as needed
+                         }
+                     }
+    
+                     // Create an array to store values to be plotted
+                     const plottedValues = Array(generatedSequenceNorm.length).fill(null);
+        
+                     // Set values within the specified range
+                     distributionValuesNorm.forEach((value, index) => {
+                         const x = generatedSequenceNorm[index];
+                         if ((x >= lowerBound && x <= upperBound) || (x >= lowerBound2 && x <= upperBound2)) {
+                             plottedValues[index] = value;
+                         }
+                     });
+                     
+        
+                     // Update the chart data
+                     myChartNorm.data.labels = generatedSequenceNorm.map(x => x.toFixed(2));
+                     myChartNorm.data.datasets[2].data = plottedValues.map((y, index) => ({ x: generatedSequenceNorm[index], y }));
+                     myChartNorm.data.datasets[2].type = 'line'; // Change the type to 'line'
+                     myChartNorm.data.datasets[2].fill = 'start'; // Enable fill from the start of the line
+                     myChartNorm.data.datasets[2].borderWidth = 1; // Set borderWidth to 0 to hide the line
+                 }
                myChartNorm.update();
-           }
+             }
 
+
+          // Get the zScore input values
+           const zScoreInput = document.getElementById('zScoreGreaterThan');
+           const zScore = parseFloat(zScoreInput.value) || 0;
+
+           const zScore2Input = document.getElementById('zScoreLessThan');
+           const zScore2 = parseFloat(zScore2Input.value) || 0;
+
+           const zScoreGreaterThanBInput = document.getElementById('zScoreGreaterThanB');
+           const zScoreGreaterThanB = parseFloat(zScoreGreaterThanBInput.value) || 0;
+
+           const zScoreLessThanBInput = document.getElementById('zScoreLessThanB');
+           const zScoreLessThanB = parseFloat(zScoreLessThanBInput.value) || 0;
+
+           const zScoreLessThanTInput = document.getElementById('zScoreLessThanT');
+           const zScoreLessThanT = parseFloat(zScoreLessThanTInput.value) || 0;
+
+           const zScoreGreaterThanTInput = document.getElementById('zScoreGreaterThanT');
+           const zScoreGreaterThanT = parseFloat(zScoreGreaterThanTInput.value) || 0;
+          // Add event listeners for zScore input changes
+          zScoreInput.addEventListener('input', updateChartNorm);
+          zScore2Input.addEventListener('input', updateChartNorm);
+          zScoreGreaterThanBInput.addEventListener('input', updateChartNorm);
+          zScoreLessThanBInput.addEventListener('input', updateChartNorm);
+          zScoreLessThanTInput.addEventListener('input', updateChartNorm);
+          zScoreGreaterThanTInput.addEventListener('input', updateChartNorm);
+          
            const meanInput = document.getElementById('meanInput');
            const stdDevInput = document.getElementById('stdDevInput');
 
@@ -496,7 +594,7 @@
               option.addEventListener('change', updateChartNorm);
           });
 
-           const generatedSequenceNorm = generateSequenceNorm(0, 1, 100);
+           const generatedSequenceNorm = generateSequenceNorm(0, 1, 1000);
            const distributionValuesNorm = generatedSequenceNorm.map(x => normalDistribution(0, 1, x));
 
            const lowerPercentile = jStat.normal.inv(0.025, 0, 1);
