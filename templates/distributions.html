@@ -37,13 +37,12 @@
                     <input type="radio" id="computeArea" name="computeOption" value="area">
                     <label for="computeArea">Compute Area</label>
       
-                    <input type="radio" id="computePercentile" name="computeOption" value="percentile">
-                    <label for="computePercentile">Compute Percentile</label>
+                    <input type="radio" id="computeQuantile" name="computeOption" value="percentile">
+                    <label for="computeQuantile">Compute Quantile(s)</label>
                 </div>
 
                 <!-- Table for Compute Area options -->
-              <!-- Table for Compute Area options -->
-              <table id="areaOptions" style="display: none; width: 50%;">
+              <table id="areaOptions" style="display: none; width: 75%;">
                   <tr>
                       <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="greaterThan" name="areaOption" value="greaterThan" checked></td>
                       <td style="border: none; padding: 0px 0px 0px 0px;">greater than</td>
@@ -102,6 +101,52 @@
                 </tr>
                   <!-- Add more rows for other options -->
               </table>
+
+
+
+              
+
+              <!-- Table for Compute Quantile options -->
+              <table id="quantileOptions" style="display: none; width: 75%;">
+                  <tr>
+                      <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="greaterThan" name="quantileOption" value="greaterThan" checked></td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;">with area below of </td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="areaGreaterThan" step="0.1" value="0.5"></td>
+                     <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
+                     <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedQuantileGreaterThan"></span></td>
+                  </tr>
+
+                  <!-- Repeat the same pattern for other rows -->
+                  <tr>
+                      <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="lessThan" name="quantileOption" value="lessThan"></td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;">with area above of</td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="areaLessThan" step="0.1" value="0.5"></td>
+                     <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                     <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
+                      <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedQuantileLessThan"></span></td>
+                  </tr>
+                  <!-- Repeat the same pattern for other rows -->
+
+                <tr>
+                    <td style="border: none; padding: 0px 0px 0px 100px;">
+                        <input type="radio" id="greaterThanB" name="quantileOption" value="greaterThanB">
+                    </td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">with area between of</td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">
+                        <input style="width: 80px" type="number" id="areaGreaterThanB" step="0.1" value="0.95"></td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
+                    <td style="border: none; padding: 0px 0px 0px 0px;">
+                        <span id="computedQuantileGreaterThanB"></span> , <span id="computedQuantileGreaterThanB2"></span>
+                    </td>
+                </tr>
+                
+                  <!-- Add more rows for other options -->
+              </table>
               </div>
             <canvas id="myChartNorm" style="width: 30%; height: 30%;"></canvas>
         </div>
@@ -116,6 +161,11 @@
           function computeNormalDistributionArea(mean, stdDev, zScore) {
             // Using jStat library to compute the cumulative distribution function (CDF)
             return jStat.normal.cdf(zScore, mean, stdDev);
+          }
+          // Function to compute area under the normal distribution curve
+          function computeNormalDistributionQuantile(mean, stdDev, area) {
+            // Using jStat library to compute the cumulative distribution function (CDF)
+            return jStat.normal.inv(area, mean, stdDev);
           }
 
           // Function to update all computed areas based on current mean and stdDev
@@ -148,7 +198,7 @@
                 }
                   // Handle special case for "greaterThanB"
                   else if (selectedRadio === "greaterThanB") {
-                    console.log("Handling greaterThanB");
+                   
                     var zScoreGreaterThanB = parseFloat(document.getElementById("zScoreGreaterThanB").value);
                     var zScoreLessThanB = parseFloat(document.getElementById("zScoreLessThanB").value);
 
@@ -159,13 +209,12 @@
                     
                     computedArea = computeNormalDistributionArea(mean, stdDev, maxZScore) - computeNormalDistributionArea(mean, stdDev, minZScore);
                     computedAreaElement = document.getElementById("computedAreaGreaterThanB"); // Corrected ID
-                    console.log(computedArea);
-                    console.log(computedAreaElement);
+                    
                   }
 
                   // Handle special case for "lessThanT"
                   else if (selectedRadio === "lessThanT") {
-                    console.log("Handling lessThanT");
+                   
                     var zScoreLessThanT = parseFloat(document.getElementById("zScoreLessThanT").value);
                     var zScoreGreaterThanT = parseFloat(document.getElementById("zScoreGreaterThanT").value);
 
@@ -176,8 +225,7 @@
                     
                     computedArea = computeNormalDistributionArea(mean, stdDev, minZScore) + (1 - computeNormalDistributionArea(mean, stdDev, maxZScore));
                     computedAreaElement = document.getElementById("computedAreaLessThanT"); // Corrected ID
-                    console.log(computedArea);
-                    console.log(computedAreaElement);
+                  
                   }
                 // Handle other cases
                 else {
@@ -211,6 +259,84 @@
 
           // Initial update when the page loads
           updateAllComputedAreas();
+
+          function updateAllComputedQuantiles() {
+            // Get user inputs
+            var mean = parseFloat(document.getElementById("meanInput").value);
+            var stdDev = parseFloat(document.getElementById("stdDevInput").value);
+
+            // Update computed areas for all radio button options
+            var radioOptions = document.getElementsByName("quantileOption");
+
+            for (var i = 0; i < radioOptions.length; i++) {
+              var selectedRadio = radioOptions[i].value;
+              var computedQuantileElement = document.getElementById("computedQuantile" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1));
+              var computedQuantileElement2 = document.getElementById("computedQuantile" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1));
+
+              if (computedQuantileElement) {
+                var area;
+                var computedQuantile;
+                var computedQuantile2;
+
+                // Handle special cases for "greaterThan" and "greaterThanOrEqual"
+                if (selectedRadio === "greaterThan" || selectedRadio === "greaterThanOrEqual") {
+                  area = parseFloat(document.getElementById("area" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1)).value);
+                  computedQuantile = computeNormalDistributionQuantile(mean, stdDev, area);
+
+                 
+
+                }
+                  // Handle special case for "greaterThanB"
+                else if (selectedRadio === "greaterThanB") {
+                    var areaGreaterThanB = parseFloat(document.getElementById("areaGreaterThanB").value);
+
+                    // Find the min and max values
+                    var minArea = (1 - areaGreaterThanB) / 2;
+                    var maxArea = areaGreaterThanB + (1 - areaGreaterThanB) / 2;
+
+                    computedQuantile = computeNormalDistributionQuantile(mean, stdDev, minArea);
+                    computedQuantile2 = computeNormalDistributionQuantile(mean, stdDev, maxArea);
+
+                    computedQuantileElement = document.getElementById("computedQuantileGreaterThanB");
+                    computedQuantileElement2 = document.getElementById("computedQuantileGreaterThanB2"); // Corrected ID
+
+                    computedQuantileElement.textContent = computedQuantile.toFixed(4);
+                    computedQuantileElement2.textContent = computedQuantile2.toFixed(4);
+                }
+
+                  
+                // Handle other cases
+                else {
+                  area = parseFloat(document.getElementById("area" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1)).value);
+                  computedQuantile = computeNormalDistributionQuantile(mean, stdDev, 1-area);
+                }
+
+                computedQuantileElement.textContent = computedQuantile.toFixed(4); // Adjust the decimal places as needed
+              }
+            }
+          }
+
+          // Attach event listeners to radio buttons
+          var radioOptions = document.getElementsByName("quantileOption");
+          for (var i = 0; i < radioOptions.length; i++) {
+            radioOptions[i].addEventListener("change", updateAllComputedQuantiles);
+          }
+
+          // Attach event listener to zScore input elements
+          var areaInputs = document.querySelectorAll('[id^="area"]');
+          for (var i = 0; i < areaInputs.length; i++) {
+            areaInputs[i].addEventListener("input", updateAllComputedQuantiles);
+          }
+
+          // Attach event listener to mean and stdDev input elements
+          var meanInput2 = document.getElementById("meanInput");
+          var stdDevInput2 = document.getElementById("stdDevInput");
+
+          meanInput2.addEventListener("input", updateAllComputedQuantiles);
+          stdDevInput2.addEventListener("input", updateAllComputedQuantiles);
+
+          // Initial update when the page loads
+          updateAllComputedQuantiles();
         </script>
 
 
@@ -292,10 +418,10 @@
                const stdDevInput = document.getElementById('stdDevInput');
 
              const computeAreaRadio = document.getElementById('computeArea');
-             const computePercentileRadio = document.getElementById('computePercentile');
+             const computeQuantileRadio = document.getElementById('computeQuantile');
 
              const areaOptionsTable = document.getElementById('areaOptions');
-
+             const quantileOptionsTable = document.getElementById('quantileOptions');
 
              let mean = parseFloat(meanInput.value) || 0;
              let standardDeviation = Math.max(parseFloat(stdDevInput.value), 0.001) || 0.001;
@@ -307,10 +433,17 @@
              if (computeAreaRadio.checked) {
                  // Compute Area option is selected
                  areaOptionsTable.style.display = 'table';  // Show the table of options
+                 quantileOptionsTable.style.display = 'none';
                  // ... (your logic for computing area based on selected options and input values)
-             } else {
+             } else if (computeQuantileRadio.checked){
+                  // Hide the table if Compute Area is not selected
+                  quantileOptionsTable.style.display = 'table';
+                  areaOptionsTable.style.display = 'none';
+                  // ... (your logic for other options)
+              } else {
                  // Hide the table if Compute Area is not selected
                  areaOptionsTable.style.display = 'none';
+                 quantileOptionsTable.style.display = 'none';
                  // ... (your logic for other options)
              }
 
@@ -356,7 +489,7 @@
 
           // Set up listeners for radio button changes
           document.getElementById('computeArea').addEventListener('change', updateChartNorm);
-          document.getElementById('computePercentile').addEventListener('change', updateChartNorm);
+          document.getElementById('computeQuantile').addEventListener('change', updateChartNorm);
 
           // Set up listeners for area option changes
           document.querySelectorAll('input[name="areaOption"]').forEach(option => {
