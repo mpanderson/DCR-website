@@ -3,154 +3,249 @@
 
 {% block content %}
 
+<style>
+  .distContainer {
+      display: flex;
+      flex-wrap: wrap;
+      height: 800px;
+      max-width: 100%;
+      position: relative;
+    background-color: black;
+  }
+
+  .selectContainer {
+      width: 15%;
+      height: 100%;
+      background-color: lightgrey;
+      display: flex;
+        flex-direction: column; /* Stack items vertically */
+        align-items: center; /* Center items horizontally */
+     position: absolute;
+    padding: 3% 0% 5% 0%;
+    box-sizing: border-box;
+      
+    
+  }
+
+  .argsContainer {
+      flex-grow: 1;
+      height: 22%;
+      width: 85%;
+      background-color: lightgrey;
+   
+margin: top; 
+      /* margin-left: 15%; */
+    top: 0;
+    right: 0;
+     position: absolute;
+    padding: 3% 5% 5% 5%;
+    box-sizing: border-box;
+  }
+
+  .graphContainer {
+      flex-grow: 5;
+      background-color: white;
+      height: 80%;
+      width: 85%;
+      bottom: 0;
+      right: 0;
+      position: absolute;
+    padding: 0% 5% 5% 5%;
+    box-sizing: border-box;
+     
+  }
+  .innerContainer {
+      text-align: center; /* Center the text inside the inner container */
+  }
+
+  /* Apply styles to the select element */
+  #distributionSelect {
+      width: 100%; /* Take up full width of the container */
+      font-size: 16px; /* Adjust the font size as needed */
+      padding: 10px; /* Add padding for better appearance */
+      border: 1px solid #ccc; /* Add a border */
+      border-radius: 10px; /* Add rounded corners */
+      outline: none; /* Remove the default outline */
+  }
+  
+</style>
+
+
     <main style="font-family: Arial">
        <center> <h2>Distributions</h2></center>
 
       <p>This page contains tools that help researchers with simple visualizations and calculations </p>
 
-      <div style="aling: center;">
-          <label for="search-input">Search this page:</label>
-          <input type="text" id="search-input" oninput="search()">
-      </div>
-
-      <h3><p class="separator"><a >Distributions</a></p>
+      <h3><p class="separator"><a >Distribution Visualization and Calculation</a></p>
       </h3>
       
       <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+      <div class="distContainer">
+
+         <div class="selectContainer">
+
+                  <div style="margin-bottom: 40%;">
+                    <table>
+                      <tr><td style="border: none; padding: 0px 0px 0px 10px;"><input type="radio" id="computeArea" name="computeOption" value="area">
+                      <label for="computeArea">Compute Areas</label></td></tr>
+                      <tr><td style="border: none; padding: 0px 0px 0px 10px;"><input type="radio" id="computeQuantile" name="computeOption" value="percentile">
+                      <label for="computeQuantile">Compute Quantiles</label></td></tr>
+          
+                    </table>
+                  </div>
+        
+           
+              
+                  <div class="distDropDown">
+                    <select id="distributionSelect">
+                      <option value="normal">Normal</option>
+                      <option value="exponential">Exponential</option>
+                      <option value="beta">Beta</option>
+                      <option value="gamma">Gamma</option>
+                      <option value="uniform">Uniform</option>
+                    </select>
+                  </div>
+                <!-- Radio buttons for Compute Area and Compute Percentile options -->
+               
+            </div>
+          <div class="argsContainer">
+                    <!-- Table for Compute Area options -->
+                      <table id="areaOptions" style="display: none; width: 75%; top: 50%; right: 50%;">
+                        <tr>
+                            <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="greaterThan" name="areaOption" value="greaterThan" checked></td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">Area <b>greater than</b></td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="zScoreGreaterThan" step="0.1" value="0"></td>
+                           <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
+                           <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedAreaGreaterThan"></span></td>
+                        </tr>
+    
+                        <!-- Repeat the same pattern for other rows -->
+                        <tr>
+                            <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="lessThan" name="areaOption" value="lessThan"></td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">Area <b>less than</b> </td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="zScoreLessThan" step="0.1" value="0"></td>
+                           <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                           <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedAreaLessThan"></span></td>
+                        </tr>
+                        <!-- Repeat the same pattern for other rows -->
+    
+                        <tr>
+                            <td style="border: none; padding: 0px 0px 0px 100px;">
+                                <input type="radio" id="greaterThanB" name="areaOption" value="greaterThanB">
+                            </td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">Area <b>between</b></td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">
+                                <input style="width: 80px" type="number" id="zScoreGreaterThanB" step="0.1" value="0">
+                            </td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">and</td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">
+                                <input style="width: 80px" type="number" id="zScoreLessThanB" step="0.1" value="0">
+                            </td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">
+                                <span id="computedAreaGreaterThanB"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="border: none; padding: 0px 0px 0px 100px;">
+                                <input type="radio" id="lessThanT" name="areaOption" value="lessThanT">
+                            </td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">Area in <b>tails</b> less than</td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">
+                                <input style="width: 80px" type="number" id="zScoreLessThanT" step="0.1" value="0">
+                            </td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">or greater than</td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">
+                                <input style="width: 80px" type="number" id="zScoreGreaterThanT" step="0.1" value="0">
+                            </td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
+                            <td style="border: none; padding: 0px 0px 0px 0px;">
+                                <span id="computedAreaLessThanT"></span>
+                            </td>
+                        </tr>
+                          <!-- Add more rows for other options -->
+                      </table>
+    
+    
+    
+    
+    
+                          <!-- Table for Compute Quantile options -->
+                          <table id="quantileOptions" style="display: none; width: 75%;">
+                            <tr>
+                                <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="greaterThan" name="quantileOption" value="greaterThan" checked></td>
+                              <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="areaGreaterThan" step="0.1" value="0.5"></td>
+                              <td style="border: none; padding: 0px 0px 0px 0px;">of area <b>above</b></td>
+                                
+                               <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
+                               <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
+                                <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
+                                <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedQuantileGreaterThan"></span></td>
+                            </tr>
+        
+                            <!-- Repeat the same pattern for other rows -->
+                            <tr>
+                                <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="lessThan" name="quantileOption" value="lessThan"></td>
+                              <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="areaLessThan" step="0.1" value="0.5"></td>
+                              <td style="border: none; padding: 0px 0px 0px 0px;">of area <b>below</b></td>
+                                
+                               <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                               <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                                <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
+                                <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedQuantileLessThan"></span></td>
+                            </tr>
+                            <!-- Repeat the same pattern for other rows -->
+        
+                            <tr>
+                                <td style="border: none; padding: 0px 0px 0px 100px;">
+                                    <input type="radio" id="greaterThanB" name="quantileOption" value="greaterThanB">
+                                </td>
+                              <td style="border: none; padding: 0px 0px 0px 0px;">
+                                <input style="width: 80px" type="number" id="areaGreaterThanB" step="0.1" value="0.95"></td>
+                              <td style="border: none; padding: 0px 0px 0px 0px;">of area <b>between</b></td>
+                                
+                                <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                                <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
+                                <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
+                                <td style="border: none; padding: 0px 0px 0px 0px;">
+                                    <span id="computedQuantileGreaterThanB"></span> , <span id="computedQuantileGreaterThanB2"></span>
+                                </td>
+                            </tr>
+        
+                            <!-- Add more rows for other options -->
+                          </table>
+                    
+          </div>
+          <div class="graphContainer">
+              <div class="chartContainer">
+                  <div class="innerContainer">
+                      <h3>Normal Distribution</h3>
+                      <label for="meanInput">Mean:</label>
+                      <input type="number" id="meanInput" step="0.1" value="0" style="width: 80px">
+                      <label for="stdDevInput">Standard Deviation:</label>
+                      <input type="number" id="stdDevInput" step="0.1" value="1" min="0.001" style="width: 80px">
+
+
+
+
+
+                  </div>
+                  <canvas id="myChartNorm" ></canvas>
+              </div>
+
+            
+          </div>
+      </div>
 
       <body1>
         
-        <div class="chartContainer">
-            <div style="align-content: inline-flex;">
-                <h3>Normal Distribution</h3>
-                <label for="meanInput">Mean:</label>
-                <input type="number" id="meanInput" step="0.1" value="0" style="width: 80px">
-                <label for="stdDevInput">Standard Deviation:</label>
-                <input type="number" id="stdDevInput" step="0.1" value="1" min="0.001" style="width: 80px">
-
-              
-            
-                 <!-- Radio buttons for Compute Area and Compute Percentile options -->
-                <div>
-                    <input type="radio" id="computeArea" name="computeOption" value="area">
-                    <label for="computeArea">Compute Area</label>
-      
-                    <input type="radio" id="computeQuantile" name="computeOption" value="percentile">
-                    <label for="computeQuantile">Compute Quantile(s)</label>
-                </div>
-
-                <!-- Table for Compute Area options -->
-              <table id="areaOptions" style="display: none; width: 75%;">
-                  <tr>
-                      <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="greaterThan" name="areaOption" value="greaterThan" checked></td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;">greater than</td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="zScoreGreaterThan" step="0.1" value="0"></td>
-                     <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
-                     <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedAreaGreaterThan"></span></td>
-                  </tr>
-                
-                  <!-- Repeat the same pattern for other rows -->
-                  <tr>
-                      <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="lessThan" name="areaOption" value="lessThan"></td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;">less than</td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="zScoreLessThan" step="0.1" value="0"></td>
-                     <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                     <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedAreaLessThan"></span></td>
-                  </tr>
-                  <!-- Repeat the same pattern for other rows -->
-                  
-                <tr>
-                    <td style="border: none; padding: 0px 0px 0px 100px;">
-                        <input type="radio" id="greaterThanB" name="areaOption" value="greaterThanB">
-                    </td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">greater than</td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">
-                        <input style="width: 80px" type="number" id="zScoreGreaterThanB" step="0.1" value="0">
-                    </td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">and less than</td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">
-                        <input style="width: 80px" type="number" id="zScoreLessThanB" step="0.1" value="0">
-                    </td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">
-                        <span id="computedAreaGreaterThanB"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="border: none; padding: 0px 0px 0px 100px;">
-                        <input type="radio" id="lessThanT" name="areaOption" value="lessThanT">
-                    </td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">less than</td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">
-                        <input style="width: 80px" type="number" id="zScoreLessThanT" step="0.1" value="0">
-                    </td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">and greater than</td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">
-                        <input style="width: 80px" type="number" id="zScoreGreaterThanT" step="0.1" value="0">
-                    </td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">
-                        <span id="computedAreaLessThanT"></span>
-                    </td>
-                </tr>
-                  <!-- Add more rows for other options -->
-              </table>
-
-
-
-              
-
-              <!-- Table for Compute Quantile options -->
-              <table id="quantileOptions" style="display: none; width: 75%;">
-                  <tr>
-                      <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="greaterThan" name="quantileOption" value="greaterThan" checked></td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;">with area below of </td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="areaGreaterThan" step="0.1" value="0.5"></td>
-                     <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
-                     <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedQuantileGreaterThan"></span></td>
-                  </tr>
-
-                  <!-- Repeat the same pattern for other rows -->
-                  <tr>
-                      <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="lessThan" name="quantileOption" value="lessThan"></td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;">with area above of</td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="areaLessThan" step="0.1" value="0.5"></td>
-                     <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                     <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
-                      <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedQuantileLessThan"></span></td>
-                  </tr>
-                  <!-- Repeat the same pattern for other rows -->
-
-                <tr>
-                    <td style="border: none; padding: 0px 0px 0px 100px;">
-                        <input type="radio" id="greaterThanB" name="quantileOption" value="greaterThanB">
-                    </td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">with area between of</td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">
-                        <input style="width: 80px" type="number" id="areaGreaterThanB" step="0.1" value="0.95"></td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
-                    <td style="border: none; padding: 0px 0px 0px 0px;">
-                        <span id="computedQuantileGreaterThanB"></span> , <span id="computedQuantileGreaterThanB2"></span>
-                    </td>
-                </tr>
-                
-                  <!-- Add more rows for other options -->
-              </table>
-              </div>
-            <canvas id="myChartNorm" style="width: 30%; height: 30%;"></canvas>
-        </div>
-
+        
 
         
         <!-- Include jStat.js library -->
@@ -279,9 +374,9 @@
                 var computedQuantile2;
 
                 // Handle special cases for "greaterThan" and "greaterThanOrEqual"
-                if (selectedRadio === "greaterThan" || selectedRadio === "greaterThanOrEqual") {
+                if (selectedRadio === "greaterThan") {
                   area = parseFloat(document.getElementById("area" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1)).value);
-                  computedQuantile = computeNormalDistributionQuantile(mean, stdDev, area);
+                  computedQuantile = computeNormalDistributionQuantile(mean, stdDev, 1-area);
 
                  
 
@@ -308,7 +403,7 @@
                 // Handle other cases
                 else {
                   area = parseFloat(document.getElementById("area" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1)).value);
-                  computedQuantile = computeNormalDistributionQuantile(mean, stdDev, 1-area);
+                  computedQuantile = computeNormalDistributionQuantile(mean, stdDev, area);
                 }
 
                 computedQuantileElement.textContent = computedQuantile.toFixed(4); // Adjust the decimal places as needed
@@ -482,10 +577,16 @@
                   data: confidenceIntervalPoints,
                   showLine: false
               };
+             myChartNorm.data.datasets[3] = {
+                 label: 'Area',
+                 data: confidenceIntervalPoints,
+                 showLine: false
+             };
 
              // Get the selected radio button for area computation
              const selectedRadio = document.querySelector('input[name="areaOption"]:checked');
-
+             const selectedRadioQ = document.querySelector('input[name="quantileOption"]:checked');
+             
              // Get the zScore input values
              const zScoreInput = document.getElementById('zScoreGreaterThan');
              const zScore = parseFloat(zScoreInput.value) || 0;
@@ -504,6 +605,20 @@
 
              const zScoreGreaterThanTInput = document.getElementById('zScoreGreaterThanT');
              const zScoreGreaterThanT = parseFloat(zScoreGreaterThanTInput.value) || 0;
+
+             const quantileGreaterThanInput = document.getElementById('computedQuantileGreaterThan');
+             const quantileGreaterThan = parseFloat(quantileGreaterThanInput.value) || 0;
+
+             const quantileLessThanInput = document.getElementById('computedQuantileLessThan');
+             const quantileLessThan = parseFloat(quantileLessThanInput.value) || 0;
+
+             const quantileGreaterThanBInput = document.getElementById('computedQuantileGreaterThanB');
+             const quantileGreaterThanB = parseFloat(quantileGreaterThanBInput.value) || -1.96;
+
+             const quantileGreaterThanB2Input = document.getElementById('computedQuantileGreaterThanB2');
+             const quantileGreaterThanB2 = parseFloat(quantileGreaterThanB2Input.value) || 1.96;
+             
+             
 
              // Compute lower and upper bounds based on the selected radio button
              let lowerBound, upperBound, lowerBound2, upperBound2;
@@ -549,6 +664,43 @@
                      myChartNorm.data.datasets[2].fill = 'start'; // Enable fill from the start of the line
                      myChartNorm.data.datasets[2].borderWidth = 1; // Set borderWidth to 0 to hide the line
                  }
+             if (computeQuantileRadio.checked) {
+                  if (selectedRadioQ) {
+                      const radioValue = selectedRadioQ.value;
+
+                      if (radioValue === 'greaterThan') {
+                          lowerBound = quantileGreaterThan;
+                          upperBound = Infinity;
+                      } else if (radioValue === 'lessThan') {
+                          lowerBound = -Infinity;
+                          upperBound = quantileLessThan;
+                      } else if (radioValue === 'greaterThanB') {
+                          lowerBound = quantileGreaterThanB;
+                          upperBound = quantileGreaterThanB2;
+                      } else {
+                          // Handle other cases as needed
+                      }
+                  }
+
+                  // Create an array to store values to be plotted
+                  const plottedValues = Array(generatedSequenceNorm.length).fill(null);
+
+                  // Set values within the specified range
+                  distributionValuesNorm.forEach((value, index) => {
+                      const x = generatedSequenceNorm[index];
+                      if ((x >= lowerBound && x <= upperBound) || (x >= lowerBound2 && x <= upperBound2)) {
+                          plottedValues[index] = value;
+                      }
+                  });
+
+
+                  // Update the chart data
+                  myChartNorm.data.labels = generatedSequenceNorm.map(x => x.toFixed(2));
+                  myChartNorm.data.datasets[3].data = plottedValues.map((y, index) => ({ x: generatedSequenceNorm[index], y }));
+                  myChartNorm.data.datasets[3].type = 'line'; // Change the type to 'line'
+                  myChartNorm.data.datasets[3].fill = 'start'; // Enable fill from the start of the line
+                  myChartNorm.data.datasets[3].borderWidth = 1; // Set borderWidth to 0 to hide the line
+              }
                myChartNorm.update();
              }
 
@@ -571,6 +723,28 @@
 
            const zScoreGreaterThanTInput = document.getElementById('zScoreGreaterThanT');
            const zScoreGreaterThanT = parseFloat(zScoreGreaterThanTInput.value) || 0;
+
+           const quantileGreaterThanInput = document.getElementById('computedQuantileGreaterThan');
+           const quantileGreaterThan = parseFloat(quantileGreaterThanInput.value) || 0;
+
+           const quantileLessThanInput = document.getElementById('computedQuantileLessThan');
+           const quantileLessThan = parseFloat(quantileLessThanInput.value) || 0;
+
+           const quantileGreaterThanBInput = document.getElementById('computedQuantileGreaterThanB');
+           const quantileGreaterThanB = parseFloat(quantileGreaterThanBInput.value) || -1.96;
+
+           const quantileGreaterThanB2Input = document.getElementById('computedQuantileGreaterThanB2');
+           const quantileGreaterThanB2 = parseFloat(quantileGreaterThanB2Input.value) || 1.96;
+
+           const areaLessThanInput = document.getElementById('areaLessThan');
+           const areaLessThan = parseFloat(areaLessThanInput.value) || 0;
+
+           const areaGreaterThanInput = document.getElementById('areaGreaterThanB');
+           const areaGreaterThan = parseFloat(areaGreaterThanInput.value) || -1.96;
+
+           const areaGreaterThanBInput = document.getElementById('areaGreaterThanB');
+           const areaGreaterThanB = parseFloat(areaGreaterThanBInput.value) || 1.96;
+          
           // Add event listeners for zScore input changes
           zScoreInput.addEventListener('input', updateChartNorm);
           zScore2Input.addEventListener('input', updateChartNorm);
@@ -578,6 +752,16 @@
           zScoreLessThanBInput.addEventListener('input', updateChartNorm);
           zScoreLessThanTInput.addEventListener('input', updateChartNorm);
           zScoreGreaterThanTInput.addEventListener('input', updateChartNorm);
+
+          quantileGreaterThanInput.addEventListener('change', updateChartNorm);
+          quantileLessThanInput.addEventListener('change', updateChartNorm);
+          quantileGreaterThanBInput.addEventListener('change', updateChartNorm);
+          quantileGreaterThanB2Input.addEventListener('change', updateChartNorm);
+
+          areaGreaterThanInput.addEventListener('input', updateChartNorm);
+          areaLessThanInput.addEventListener('input', updateChartNorm);
+          areaGreaterThanBInput.addEventListener('input', updateChartNorm);
+          
           
            const meanInput = document.getElementById('meanInput');
            const stdDevInput = document.getElementById('stdDevInput');
@@ -591,6 +775,11 @@
 
           // Set up listeners for area option changes
           document.querySelectorAll('input[name="areaOption"]').forEach(option => {
+              option.addEventListener('change', updateChartNorm);
+          });
+
+          // Set up listeners for area option changes
+          document.querySelectorAll('input[name="quantileOption"]').forEach(option => {
               option.addEventListener('change', updateChartNorm);
           });
 
