@@ -67,6 +67,15 @@ margin: top;
       border-radius: 10px; /* Add rounded corners */
       outline: none; /* Remove the default outline */
   }
+
+  /* Media Queries for Tablet and Mobile */
+  @media only screen and (max-width: 768px) {
+      .selectContainer,
+      .argsContainer,
+      .graphContainer {
+          width: 100%;
+      }
+  }
   
 </style>
 
@@ -607,16 +616,16 @@ margin: top;
              const zScoreGreaterThanT = parseFloat(zScoreGreaterThanTInput.value) || 0;
 
              const quantileGreaterThanInput = document.getElementById('computedQuantileGreaterThan');
-             const quantileGreaterThan = parseFloat(quantileGreaterThanInput.value) || 0;
+             const quantileGreaterThan = quantileGreaterThanInput.textConent || 0;
 
              const quantileLessThanInput = document.getElementById('computedQuantileLessThan');
-             const quantileLessThan = parseFloat(quantileLessThanInput.value) || 0;
+             const quantileLessThan = quantileLessThanInput.textContent || 0;
 
              const quantileGreaterThanBInput = document.getElementById('computedQuantileGreaterThanB');
-             const quantileGreaterThanB = parseFloat(quantileGreaterThanBInput.value) || -1.96;
+             const quantileGreaterThanB = quantileGreaterThanBInput.textContent || -1.96;
 
              const quantileGreaterThanB2Input = document.getElementById('computedQuantileGreaterThanB2');
-             const quantileGreaterThanB2 = parseFloat(quantileGreaterThanB2Input.value) || 1.96;
+             const quantileGreaterThanB2 = quantileGreaterThanB2Input.textContent || 1.96;
              
              
 
@@ -663,44 +672,47 @@ margin: top;
                      myChartNorm.data.datasets[2].type = 'line'; // Change the type to 'line'
                      myChartNorm.data.datasets[2].fill = 'start'; // Enable fill from the start of the line
                      myChartNorm.data.datasets[2].borderWidth = 1; // Set borderWidth to 0 to hide the line
-                 }
-             if (computeQuantileRadio.checked) {
-                  if (selectedRadioQ) {
-                      const radioValue = selectedRadioQ.value;
-
-                      if (radioValue === 'greaterThan') {
-                          lowerBound = quantileGreaterThan;
-                          upperBound = Infinity;
-                      } else if (radioValue === 'lessThan') {
-                          lowerBound = -Infinity;
-                          upperBound = quantileLessThan;
-                      } else if (radioValue === 'greaterThanB') {
-                          lowerBound = quantileGreaterThanB;
-                          upperBound = quantileGreaterThanB2;
-                      } else {
-                          // Handle other cases as needed
-                      }
-                  }
-
-                  // Create an array to store values to be plotted
-                  const plottedValues = Array(generatedSequenceNorm.length).fill(null);
-
-                  // Set values within the specified range
-                  distributionValuesNorm.forEach((value, index) => {
-                      const x = generatedSequenceNorm[index];
-                      if ((x >= lowerBound && x <= upperBound) || (x >= lowerBound2 && x <= upperBound2)) {
-                          plottedValues[index] = value;
-                      }
-                  });
-
-
-                  // Update the chart data
-                  myChartNorm.data.labels = generatedSequenceNorm.map(x => x.toFixed(2));
-                  myChartNorm.data.datasets[3].data = plottedValues.map((y, index) => ({ x: generatedSequenceNorm[index], y }));
-                  myChartNorm.data.datasets[3].type = 'line'; // Change the type to 'line'
-                  myChartNorm.data.datasets[3].fill = 'start'; // Enable fill from the start of the line
-                  myChartNorm.data.datasets[3].borderWidth = 1; // Set borderWidth to 0 to hide the line
-              }
+                 } else if (computeQuantileRadio.checked) {
+                        if (selectedRadioQ) {
+                            const radioValue = selectedRadioQ.value;
+      
+                            if (radioValue === 'greaterThan') {
+                                lowerBound = quantileGreaterThanInput.textContent;
+                                upperBound = Infinity;
+                            } else if (radioValue === 'lessThan') {
+                                lowerBound = -Infinity;
+                                upperBound = quantileLessThanInput.textContent;
+                            } else if (radioValue === 'greaterThanB') {
+                                lowerBound = quantileGreaterThanBInput.textContent;
+                                upperBound = quantileGreaterThanB2Input.textContent;
+                            } else {
+                                // Handle other cases as needed
+                            }
+                        }
+      
+                        // Create an array to store values to be plotted
+                        const plottedValues = Array(generatedSequenceNorm.length).fill(null);
+      
+                        // Set values within the specified range
+                        distributionValuesNorm.forEach((value, index) => {
+                            const x = generatedSequenceNorm[index];
+                            if ((x >= lowerBound && x <= upperBound)) {
+                                plottedValues[index] = value;
+                            }
+                        });
+      
+      
+                        // Update the chart data
+                        myChartNorm.data.labels = generatedSequenceNorm.map(x => x.toFixed(2));
+                        myChartNorm.data.datasets[3].data = plottedValues.map((y, index) => ({ x: generatedSequenceNorm[index], y }));
+                        myChartNorm.data.datasets[3].type = 'line'; // Change the type to 'line'
+                        myChartNorm.data.datasets[3].fill = 'start'; // Enable fill from the start of the line
+                        myChartNorm.data.datasets[3].borderWidth = 1; // Set borderWidth to 0 to hide the line
+                        
+              } else {
+                 // Handle other cases as needed
+             }
+             
                myChartNorm.update();
              }
 
@@ -725,21 +737,21 @@ margin: top;
            const zScoreGreaterThanT = parseFloat(zScoreGreaterThanTInput.value) || 0;
 
            const quantileGreaterThanInput = document.getElementById('computedQuantileGreaterThan');
-           const quantileGreaterThan = parseFloat(quantileGreaterThanInput.value) || 0;
+           const quantileGreaterThan = quantileGreaterThanInput.textContent || 0;
 
            const quantileLessThanInput = document.getElementById('computedQuantileLessThan');
-           const quantileLessThan = parseFloat(quantileLessThanInput.value) || 0;
+           const quantileLessThan = quantileLessThanInput.textContent || 0;
 
            const quantileGreaterThanBInput = document.getElementById('computedQuantileGreaterThanB');
-           const quantileGreaterThanB = parseFloat(quantileGreaterThanBInput.value) || -1.96;
+           const quantileGreaterThanB = quantileGreaterThanBInput.textContent || -1.96;
 
            const quantileGreaterThanB2Input = document.getElementById('computedQuantileGreaterThanB2');
-           const quantileGreaterThanB2 = parseFloat(quantileGreaterThanB2Input.value) || 1.96;
+           const quantileGreaterThanB2 = quantileGreaterThanB2Input.textContent || 1.96;
 
            const areaLessThanInput = document.getElementById('areaLessThan');
            const areaLessThan = parseFloat(areaLessThanInput.value) || 0;
 
-           const areaGreaterThanInput = document.getElementById('areaGreaterThanB');
+           const areaGreaterThanInput = document.getElementById('areaGreaterThan');
            const areaGreaterThan = parseFloat(areaGreaterThanInput.value) || -1.96;
 
            const areaGreaterThanBInput = document.getElementById('areaGreaterThanB');
