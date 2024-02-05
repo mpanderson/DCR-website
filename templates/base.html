@@ -103,14 +103,15 @@
           </header>
 
         <div id="navbar" style="font-family: Arial">
-          <a class="active" href="/">Home</a>
-          <a href="publicData">Data Sets</a>
-          <a href="analysisExamps">Data Analysis Examples</a>
-          <a href="powerExamps">Power Analysis Examples</a>
-          <a href="workshops">Seminars and Workshops</a>
-          <a href="softTrain">Software Training</a>
-          <a href="tutorials">Tutorials</a>
-          <a href="tools">Tools</a>
+          <a class="{% if current_page == '/' %}active{% endif %}" href="/">Home</a>
+          <a class="{% if current_page == 'publicData' %}active{% endif %}" href="publicData">Data Sets</a>
+          <a class="{% if current_page == 'analysisExamps' %}active{% endif %}" href="analysisExamps">Data Analysis Examples</a>
+          <a class="{% if current_page == 'powerExamps' %}active{% endif %}" href="powerExamps">Power Analysis Examples</a>
+          <a class="{% if current_page == 'workshops' %}active{% endif %}" href="workshops">Seminars and Workshops</a>
+          <a class="{% if current_page == 'softTrain' %}active{% endif %}" href="softTrain">Software Training</a>
+          <a class="{% if current_page == 'tutorials' %}active{% endif %}" href="tutorials">Tutorials</a>
+          <a class="{% if current_page == 'tools' %}active{% endif %}" href="tools">Tools</a>
+          <a class="{% if current_page == 'glossary' %}active{% endif %}" href="glossary">Glossary</a>
            <a href="https://redcap.ouhsc.edu/redcap/surveys/?s=u8Tipfbiwk">Request Form</a>
         </div>
 

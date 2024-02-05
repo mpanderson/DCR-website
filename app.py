@@ -12,35 +12,39 @@ app = Flask(__name__, static_folder="static")
 
 @app.route('/')
 def homepage():
-    return render_template('index.html')
+    return render_template('index.html',current_page='/')
 
 @app.route('/publicData')
 def datapage():
-    return render_template('publicData.html')
+    return render_template('publicData.html',current_page='publicData')
 
 @app.route('/analysisExamps')
 def analysispage():
-    return render_template('analysisExamps.html')
+    return render_template('analysisExamps.html',current_page='analysisExamps')
 
 @app.route('/powerExamps')
 def powerpage():
-    return render_template('powerExamps.html')
+    return render_template('powerExamps.html',current_page='powerExamps')
   
 @app.route('/softTrain')
 def softwarepage():
-    return render_template('softwareTrain.html')
+    return render_template('softwareTrain.html',current_page='softTrain')
 
 @app.route('/workshops')
 def workshoppage():
-    return render_template('workshops.html')
+    return render_template('workshops.html',current_page='workshops')
 
 @app.route('/tutorials')
 def tutorialpage():
-    return render_template('tutorials.html')
+    return render_template('tutorials.html',current_page='tutorials')
 
 @app.route('/tools')
 def toolspage():
-    return render_template('tools.html')
+    return render_template('tools.html',current_page='tools')
+
+@app.route('/glossary')
+def glossarypage():
+    return render_template('glossary.html',current_page='glossary')
 
 
 @app.route('/distributions', methods=['GET', 'POST'])

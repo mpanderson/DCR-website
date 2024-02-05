@@ -1,0 +1,426 @@
+  {% extends "base.html"%}
+  {% block title%}Glossary{%endblock%}
+
+  {% block content %}
+    <main style="font-family: Arial">
+       <center> <h2>Glossary of Terms/Topics</h2></center>
+
+      <div style="aling: center;">
+          <label for="search-input">Search this page:</label>
+          <input type="text" id="search-input" oninput="search()">
+      </div>
+
+       <h3><p class="separator">Glossary of Statistical Terms</p>
+       </h3>
+
+       
+
+
+       <div><table class="sortable-table">
+          <thead>
+              <tr>
+                  <th>Term</th>
+                  <th>Description</th>
+
+              </tr>
+          </thead>
+          <tbody>   
+          <!-- Separator row -->
+           <!--<tr> -->
+             <!--  <td colspan="2" style="background-color: #ccc; text-align: center;"><b>Data Sets in Public Health and Medicine</b></td>-->
+           <!--</tr>-->
+
+              <tr>
+                  <td><b>Power</b></td>
+                  <td>The probability of rejecting the null hypothesis when it is false.  This probability is the complement of the probability of type II error and denoted as 1-beta.</td>
+              </tr>
+              <tr>
+                  <td><b>Type I Error</b></td>
+                  <td>Rejecting the Null Hypothesis when it is true.  The probability of this error is the significance level of the test, alpha. </td> 
+              </tr>
+              <tr>
+                  <td><b>Type II Error</b></td>
+                  <td>Failing to reject the null hypothesis when it is indeed false.  The probability of this error depends on what the null value is and is called beta. </td>
+              </tr>
+              <tr>
+                  <td><b>Cohort Study Design</b></td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td><b>Cross-sectional Study Design</b> </td>
+                  <td></td>
+              </tr>
+              <tr>
+                  <td><b>Case-Control Study Design</b></td>
+                  <td> </td>
+              </tr>
+            <tr>
+                <td><b>Observational Study Design</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Experimental Study Design</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Ecological Study Design</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Randomized Controlled Trial</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Blinded Study</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Bias</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Double Blinded Study</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Experiment</b></td>
+                <td> Any system of process that, when carried out, can result in more than one possible outcome.</td>
+            </tr>
+            <tr>
+                <td><b>Outcome</b></td>
+                <td>The result of one completed trial of an experiment. </td>
+            </tr>
+            <tr>
+                <td><b>Conditional Probability</b></td>
+                <td> The probability of an event, given another event (or events) have occured.</td>
+            </tr>
+            <tr>
+                <td><b>Event</b></td>
+                <td>A collection of outcomes which are of interest to the investigator. </td>
+            </tr>
+            <tr>
+                <td><b>Sample Space</b></td>
+                <td>A collection of all the possible outcomes from an experiment. </td>
+            </tr>
+            <tr>
+                <td><b>Mutually Exclusive Events</b></td>
+                <td> Events that cannont simultaneously occur.  That is, if one event has occured, the others cannot occur. Note: Mutually exclusive events cannot be independent events.</td>
+            </tr>
+            <tr>
+                <td><b>Independent Events</b></td>
+                <td> Events are independent if the occurence of one event in no way influences the probability of the occurence of the others.  Note: Independent events cannot be mutually exclusive events.</td>
+            </tr>
+            <tr>
+                <td><b>Counting Techniques</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Null Hypothesis</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Alternative Hypothesis</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Hypothesis Testing</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Analysis of Variance (ANOVA)</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Analysis of Covariance (ANCOVA)</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Binomial Distribution</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Normal Distribution</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Chi-square Distribution</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Poisson Distribution</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Random Variable</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Bayes' Theorem</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Censoring</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Central Limit Theorem</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Biostatisics</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Attributable fraction in the population</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Attributable fraction in the exposed cases</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Number Needed to Treat (NNT)</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Intent to Treat Analysis</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Per Protocol Analysis</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Efficacy</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Simple Random Sample</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Stratified Random Sample</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Systemmatic Sample</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Cluster Sample</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Snowball Sample</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Convenience Sample</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Coefficient of Determination</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Coefficient of Variation</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Confidence Interval</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Degrees of Freedom</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Dependent Variable</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Descriptive Statistics</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Effect Modification</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Exposure</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Factor Analysis</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Finite Population</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Multiple Imputation</b></td>
+                <td> </td>
+            </tr>
+            <tr>
+                <td><b>Fisher's Exact Test</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Student's t-Test</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Chi-square Test</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Wilcoxon-Mann-Whitney Test</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Hazard Function</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Heteroscedasticity</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Homogeneity</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Independent Variable</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Predictor Variable</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Outcome Variable</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Incidence Rate</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Statistical Inference</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Interquartile Range</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Likert Scale</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Logistic Regression</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>McNemar Test</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Measurement Error</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Meta Analysis</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Multiple Linear Regression</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Nominal Data</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Nonparemetric Statistics</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Nonresponse Bias</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Odds Ratio</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>One-tailed Hypothesis Test</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Two-tailed Hypothesis Test</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Paired t-Test</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Parameter</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Pearson Correlation Coefficient</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Spearman Rank Correlation Coefficient</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Person-time Rate</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Pilot Study</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Population</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Prevalence</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Principle Components Analysis</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Probabiliyt</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>p-value</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Qualitative Data</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Quantitative Data</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Random Error</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Range</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Risk Ratio</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Rejection Region</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Risk Difference</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Standard Deviation</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Standard Error</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Sample</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Sampling Distribution</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Sampling Frame</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Standard Normal Distribution</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>Statistic</b></td>
+                <td> </td>
+            </tr><tr>
+                <td><b>z-score</b></td>
+                <td> </td>
+            </tr>
+              
+                   </tbody>
+               </table></div>
+
+
+    </main>
+
+ {% endblock %}
