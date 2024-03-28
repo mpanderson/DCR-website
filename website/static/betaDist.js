@@ -1,105 +1,81 @@
+// Define global variable for chart to access it in update function
+let myChartBeta;
 
+// Function to calculate beta distribution values
 function betaDistribution(alpha, beta, x) {
     return jStat.beta.pdf(x, alpha, beta);
 }
 
-function generateSequenceBeta(alpha, beta, numPoints) {
+// Function to generate a sequence of x values for the chart
+function generateSequenceBeta(numPoints) {
     const sequence = [];
-    const lowerBound = 0;
-    const upperBound = 1;
-    const step = (upperBound - lowerBound) / (numPoints - 1);
-
     for (let i = 0; i < numPoints; i++) {
-        const value = lowerBound + i * step;
-        sequence.push(value);
+        sequence.push(i / (numPoints - 1));
     }
-
     return sequence;
 }
 
-function updateChartBeta() {
-    const betaAlphaInput = document.getElementById('betaAlphaInput');
-    const betaBetaInput = document.getElementById('betaBetaInput');
-
-  let alpha = Math.max(parseFloat(betaAlphaInput.value), 0.001) || 0.001;
-  let beta = Math.max(parseFloat(betaBetaInput.value), 0.001) || 0.001;
-
-  // Ensure that stdDev is not below 0.001
-    alpha = Math.max(alpha, 0.001);
-    beta = Math.max(beta, 0.001);
-
-    const generatedSequenceBeta = generateSequenceBeta(alpha, beta, 100);
-    const distributionValuesBeta = generatedSequenceBeta.map(x => betaDistribution(alpha, beta, x));
-
-    const lowerPercentile = jStat.beta.inv(0.025, alpha, beta);
-    const upperPercentile = jStat.beta.inv(0.975, alpha, beta);
-
-    // Add points at 2.5th and 97.5th percentiles
-    const confidenceIntervalPoints = [
-        { x: lowerPercentile, y: betaDistribution(alpha, beta, lowerPercentile) },
-        { x: upperPercentile, y: betaDistribution(alpha, beta, upperPercentile) }
-    ];
-
-    myChartBeta.data.labels = generatedSequenceBeta.map(x => x.toFixed(2));
-    myChartBeta.data.datasets[0].data = distributionValuesBeta;
-    myChartBeta.data.datasets[0].pointRadius = [0];  // Hide default points
-    myChartBeta.data.datasets[0].pointBackgroundColor = ['red', 'red'];  // Color for confidence interval points
-    myChartBeta.data.datasets[0].pointBorderColor = ['red', 'red'];  // Border color for confidence interval points
-    myChartBeta.data.datasets[0].pointStyle = ['circle', 'circle'];  // Style for confidence interval points
-    myChartBeta.data.datasets[1] = {
-        label: '95% Confidence Interval',
-        data: confidenceIntervalPoints,
-        pointRadius: [6, 6],  // Size of confidence interval points
-        pointBackgroundColor: ['red', 'red'],
-        pointBorderColor: ['red', 'red'],
-        pointStyle: ['circle', 'circle'],
-        showLine: false
-    };
-
-    myChartBeta.update();
-}
-
-const betaAlphaInput = document.getElementById('betaAlphaInput');
-const betaBetaInput = document.getElementById('betaBetaInput');
-
-betaAlphaInput.addEventListener('input', updateChartBeta);
-betaBetaInput.addEventListener('input', updateChartBeta);
-
-const generatedSequenceBeta = generateSequenceBeta(1, 1, 100);
-const distributionValuesBeta = generatedSequenceBeta.map(x => betaDistribution(1, 1, x));
-
- console.log('sequence:',generatedSequenceBeta)
- console.log('distVals:',distributionValuesBeta)
-
+// Function to create the beta distribution chart
 function createChartBeta() {
     const ctxBeta = document.getElementById('myChartBeta').getContext('2d');
-    const myChartBeta = new Chart(ctxBeta, {
+    myChartBeta = new Chart(ctxBeta, {
         type: 'line',
         data: {
-            labels: generatedSequenceBeta.map(x => x.toFixed(2)),
+            labels: [],
             datasets: [{
                 label: 'Beta Distribution',
-                data: distributionValuesBeta,
+                data: [],
                 borderColor: 'rgba(75, 192, 192, 1)',
-                fill: false,
-                pointRadius: [0]  // Hide default points
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                fill: true,
+                pointRadius: 0
             }]
         },
         options: {
             scales: {
                 x: {
                     type: 'linear',
-                    position: 'bottom'
+                    position: 'bottom',
+                    title: {
+                        display: true,
+                        text: 'x'
+                    }
                 },
                 y: {
                     type: 'linear',
-                    position: 'left'
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Probability Density'
+                    }
                 }
             }
         }
     });
-  return myChartBeta;
-  }
-// Initial chart creation (using default values)
-updateChartBeta();
+}
 
+// Function to update the beta distribution chart based on user inputs
+function updateChartBeta() {
+    const alpha = parseFloat(document.getElementById('betaAlphaInput').value) || 1;
+    const beta = parseFloat(document.getElementById('betaBetaInput').value) || 1;
+
+    const numPoints = 100;
+    const xValues = generateSequenceBeta(numPoints);
+    const yValues = xValues.map(x => betaDistribution(alpha, beta, x));
+
+    myChartBeta.data.labels = xValues;
+    myChartBeta.data.datasets[0].data = yValues;
+    myChartBeta.update();
+}
+
+// Event listeners for the input fields
+document.addEventListener('DOMContentLoaded', function() {
+    createChartBeta(); // First, create the chart
+
+    // Then, attach event listeners
+    document.getElementById('betaAlphaInput').addEventListener('input', updateChartBeta);
+    document.getElementById('betaBetaInput').addEventListener('input', updateChartBeta);
+
+    // Initial update
+    updateChartBeta();
+});
