@@ -5,8 +5,9 @@ Created on Mon Sep  4 06:47:21 2023
 @author: mpand
 """
 
-from flask import Flask, render_template, request, session 
-
+from flask import Flask, render_template, request, jsonify 
+import numpy as np
+import scipy.stats as stats
 
 app = Flask(__name__, static_folder="static")
 
@@ -59,5 +60,48 @@ def sampleSizepage():
 def randomizationspage():
     return render_template('randomizations.html')
 
+@app.route('/confidenceInterval')
+def confidenceIntervalpage():
+    return render_template('confidenceInterval.html')
+
+
+@app.route('/generate_sample', methods=['POST'])
+def generate_sample():
+    try:
+        data = request.get_json()
+        mu = data['mu']
+        sigma = data['sigma']
+        n = data['n']
+        confidence = data['confidence'] / 100
+
+        # Logging input data
+        app.logger.debug(f"Received data: mu={mu}, sigma={sigma}, n={n}, confidence={confidence}")
+
+        # Validate inputs
+        if not (isinstance(mu, (int, float)) and isinstance(sigma, (int, float)) and isinstance(n, int) and isinstance(confidence, float)):
+            raise ValueError("Invalid input types")
+
+        if sigma <= 0 or n <= 0 or not (0 < confidence < 1):
+            raise ValueError("Invalid input values")
+
+        # Generate random sample
+        sample = np.random.normal(mu, sigma, n)
+
+        # Calculate the sample mean and standard error
+        sample_mean = np.mean(sample)
+        sample_se = stats.sem(sample)
+
+        # Calculate the confidence interval
+        ci = stats.t.interval(confidence, n-1, loc=sample_mean, scale=sample_se)
+        lower, upper = ci
+
+        # Check if the interval contains the population mean
+        contains_mu = lower <= mu <= upper
+
+        return jsonify(lower=lower, upper=upper, containsMu=bool(contains_mu))
+
+    except Exception as e:
+        app.logger.error(f"Error occurred: {e}")
+        return jsonify(error=str(e)), 500
 if __name__ == '__main__':
     app.run('0.0.0.0',debug=True)

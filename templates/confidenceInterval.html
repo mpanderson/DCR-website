@@ -1,0 +1,74 @@
+{% extends "base.html"%}
+{% block title%}Confidence Interval{%endblock%}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    .container {
+        display: flex;
+    }
+    .input-column {
+        flex: 1;
+        padding: 20px;
+    }
+    .plot-column {
+        flex: 2;
+        padding: 20px;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    #plot {
+        width: 100%;
+        height: 500px;
+        border: 1px solid #ccc;
+    }
+</style>
+{% block content %}
+  <main style="font-family: Arial">
+     <center> <h2>Confidence Interval Visualization</h2></center>
+
+    <p>This page helps explain and visualize the concept of the confidence interval. </p>
+
+    <div style="aling: center;">
+        <label for="search-input">Search this page:</label>
+        <input type="text" id="search-input" oninput="search()">
+    </div>
+
+    <h3><p class="separator"><a >Confidence Interval Visualization</a></p>
+    </h3>
+
+
+    <div class="container">
+      <div class="input-column">
+          <h2>Input Parameters</h2>
+          <div class="form-group">
+              <label for="mu">Population Mean (μ):</label>
+              <input type="number" id="mu" step="0.1">
+          </div>
+          <div class="form-group">
+              <label for="sigma">Population Standard Deviation (σ):</label>
+              <input type="number" id="sigma" step="0.1">
+          </div>
+          <div class="form-group">
+              <label for="n">Sample Size (n):</label>
+              <input type="number" id="n">
+          </div>
+          <div class="form-group">
+              <label for="confidence">Confidence Level (%):</label>
+              <input type="number" id="confidence" step="0.1" min="0" max="100">
+          </div>
+          <button id="submit">Submit</button>
+      </div>
+      <div class="plot-column">
+          <h2>Forest Plot</h2>
+          <div id="plot"></div>
+      </div>
+    </div>
+
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="static/app.js"></script>
+
+    
+
+  {% endblock %}
