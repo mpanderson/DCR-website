@@ -1,29 +1,6 @@
 {% extends "base.html"%}
 {% block title%}Confidence Interval{%endblock%}
-<style>
-    body {
-        font-family: Arial, sans-serif;
-    }
-    .container {
-        display: flex;
-    }
-    .input-column {
-        flex: 1;
-        padding: 20px;
-    }
-    .plot-column {
-        flex: 2;
-        padding: 20px;
-    }
-    .form-group {
-        margin-bottom: 15px;
-    }
-    #plot {
-        width: 100%;
-        height: 500px;
-        border: 1px solid #ccc;
-    }
-</style>
+
 {% block content %}
   <main style="font-family: Arial">
      <center> <h2>Confidence Interval Visualization</h2></center>
@@ -44,19 +21,19 @@
           <h2>Input Parameters</h2>
           <div class="form-group">
               <label for="mu">Population Mean (μ):</label>
-              <input type="number" id="mu" step="0.1">
+              <input type="number" id="mu" step="0.1" value="0">
           </div>
           <div class="form-group">
               <label for="sigma">Population Standard Deviation (σ):</label>
-              <input type="number" id="sigma" step="0.1">
+              <input type="number" id="sigma" step="0.1" value="1">
           </div>
           <div class="form-group">
               <label for="n">Sample Size (n):</label>
-              <input type="number" id="n">
+              <input type="number" id="n" value="15">
           </div>
           <div class="form-group">
               <label for="confidence">Confidence Level (%):</label>
-              <input type="number" id="confidence" step="0.1" min="0" max="100">
+              <input type="number" id="confidence" step="0.1" min="0" max="100" value="95">
           </div>
           <button id="submit">Submit</button>
       </div>
