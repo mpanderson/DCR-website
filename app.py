@@ -8,6 +8,7 @@ Created on Mon Sep  4 06:47:21 2023
 from flask import Flask, render_template, request, jsonify 
 import numpy as np
 import scipy.stats as stats
+import random
 
 app = Flask(__name__, static_folder="static")
 
@@ -103,5 +104,68 @@ def generate_sample():
     except Exception as e:
         app.logger.error(f"Error occurred: {e}")
         return jsonify(error=str(e)), 500
+
+
+
+@app.route('/montyHall')
+def montyHallpage():
+    return render_template('montyHall.html')
+
+@app.route('/generate_doors', methods=['POST'])
+def generate_doors():
+    num_doors = int(request.form['num_doors'])
+    winner = random.randint(0, num_doors - 1)
+    return jsonify({'num_doors': num_doors, 'winner': winner})
+
+@app.route('/reveal_goat', methods=['POST'])
+def reveal_goat():
+    data = request.get_json()
+    num_doors = data['num_doors']
+    chosen_door = data['chosen_door']
+    winner = data['winner']
+
+    if chosen_door == winner:
+        goat_doors = [i for i in range(num_doors) if i != winner]
+        revealed_goats = random.sample(goat_doors, num_doors - 2)
+    else:
+        goat_doors = [i for i in range(num_doors) if i != winner and i != chosen_door]
+        revealed_goats = goat_doors
+
+    return jsonify({'revealed_goats': revealed_goats})
+
+
+@app.route('/simulate', methods=['POST'])
+def simulate():
+    data = request.json
+    num_doors = int(data['num_doors'])
+    num_simulations = int(data['num_simulations'])
+    stay_wins = 0
+    switch_wins = 0
+
+    stay_percentages = []
+    switch_percentages = []
+
+    for i in range(num_simulations):
+        winner = random.randint(0, num_doors - 1)
+        chosen_door = random.randint(0, num_doors - 1)
+        if chosen_door == winner:
+            stay_wins += 1
+        else:
+            switch_wins += 1
+
+        stay_percentages.append((stay_wins / (i + 1)) * 100)
+        switch_percentages.append((switch_wins / (i + 1)) * 100)
+
+    stay_percentage = (stay_wins / num_simulations) * 100
+    switch_percentage = (switch_wins / num_simulations) * 100
+
+    return jsonify({
+        'stay_percentage': stay_percentage, 
+        'switch_percentage': switch_percentage,
+        'stay_percentages': stay_percentages,
+        'switch_percentages': switch_percentages
+    })
+
+
 if __name__ == '__main__':
     app.run('0.0.0.0',debug=True)

@@ -26,6 +26,70 @@ document.getElementById('submit').addEventListener('click', async function() {
     }
 });
 
+document.getElementById('reset').addEventListener('click', function() {
+    // Reset input values
+    document.getElementById('mu').value = 0;
+    document.getElementById('sigma').value = 1;
+    document.getElementById('n').value = 15;
+    document.getElementById('confidence').value = 95;
+    document.getElementById('n_sim').value = 10;
+
+    // Reset intervals and plot
+    intervals = [];
+    intervalCount = 0;
+    intervalsContainingMu = 0;
+
+    document.getElementById('interval-count').textContent = 0;
+    document.getElementById('percentage-containing-mu').textContent = "0.00";
+
+    // Clear the plot
+    g.selectAll(".interval").remove();
+    g.selectAll(".x-axis").remove();
+    g.selectAll(".y-axis").remove();
+    g.append("g")
+        .attr("class", "x-axis")
+        .attr("transform", `translate(0,${height})`)
+        .call(d3.axisBottom(x));
+    g.append("g")
+        .attr("class", "y-axis")
+        .call(d3.axisLeft(y).tickFormat(""));
+
+    // Update the vertical line position at mu
+    muLine.attr("x1", x(0)).attr("x2", x(0));  // Assuming default mu is 0
+});
+
+document.getElementById('simulate').addEventListener('click', async function() {
+    const mu = parseFloat(document.getElementById('mu').value);
+    const sigma = parseFloat(document.getElementById('sigma').value);
+    const n = parseInt(document.getElementById('n').value);
+    const confidence = parseFloat(document.getElementById('confidence').value);
+    const n_sim = parseInt(document.getElementById('n_sim').value);
+
+    if (isNaN(mu) || isNaN(sigma) || isNaN(n) || isNaN(confidence) || isNaN(n_sim)) {
+        alert("Please enter valid numeric values.");
+        return;
+    }
+
+    for (let i = 0; i < n_sim; i++) {
+        const response = await fetch('/generate_sample', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ mu, sigma, n, confidence })
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            updatePlot(mu, sigma, result.lower, result.upper, result.containsMu);
+        } else {
+            const error = await response.json();
+            alert("Error: " + error.error);
+            break;
+        }
+    }
+});
+
 let intervals = [];
 let intervalCount = 0;
 let intervalsContainingMu = 0;
@@ -66,7 +130,7 @@ function updatePlot(mu, sigma, lower, upper, containsMu) {
     document.getElementById('interval-count').textContent = intervalCount;
     document.getElementById('percentage-containing-mu').textContent = percentageContainingMu;
 
-    x.domain([mu - 1.5 * sigma, mu + 1.5 * sigma]);
+    x.domain([mu - 4 * sigma, mu + 4 * sigma]);
     y.domain(intervals.map((_, i) => i));
 
     g.selectAll(".interval").remove();
