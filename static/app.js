@@ -38,8 +38,10 @@ document.getElementById('reset').addEventListener('click', function() {
     intervals = [];
     intervalCount = 0;
     intervalsContainingMu = 0;
+    intervalsNotContainingMu = 0;
 
     document.getElementById('interval-count').textContent = 0;
+    document.getElementById('interval-not-count').textContent = 0;
     document.getElementById('percentage-containing-mu').textContent = "0.00";
 
     // Clear the plot
@@ -93,6 +95,7 @@ document.getElementById('simulate').addEventListener('click', async function() {
 let intervals = [];
 let intervalCount = 0;
 let intervalsContainingMu = 0;
+let intervalsNotContainingMu = 0;
 
 const svg = d3.select("#plot")
     .append("svg")
@@ -117,20 +120,91 @@ const muLine = g.append("line")
     .attr("stroke", "blue")
     .attr("stroke-width", 2);
 
+
+
+// Set up dimensions and margins for the time series plot
+const marginTS = { top: 20, right: 30, bottom: 30, left: 40 };
+const widthTS = 600 - marginTS.left - marginTS.right;
+const heightTS = 300 - marginTS.top - marginTS.bottom;
+
+// Create the SVG container for the time series plot
+const svgTS = d3.select("#time-series-plot")
+    .append("svg")
+    .attr("width", widthTS + marginTS.left + marginTS.right)
+    .attr("height", heightTS + marginTS.top + marginTS.bottom)
+    .append("g")
+    .attr("transform", `translate(${marginTS.left},${marginTS.top})`);
+
+// Set up scales for the time series plot
+const xTS = d3.scaleLinear().range([0, widthTS]);
+const yTS = d3.scaleLinear().range([heightTS, 0]);
+
+// Define the line for the time series plot
+const line = d3.line()
+    .x((d, i) => xTS(i + 1))
+    .y(d => yTS(d));
+
+// Add x-axis and y-axis to the time series plot
+svgTS.append("g")
+    .attr("class", "x-axis-ts")
+    .attr("transform", `translate(0,${heightTS})`);
+
+svgTS.append("g")
+    .attr("class", "y-axis-ts");
+
+// Add a horizontal line for the confidence level
+const confidenceLevelLine = svgTS.append("line")
+    .attr("class", "confidence-level-line")
+    .attr("stroke", "blue")
+    .attr("stroke-dasharray", "4");
+
+// Function to update the time series plot
+function updateTimeSeriesPlot(confidenceLevel, percentageData) {
+    // Update the domains of the scales
+    xTS.domain([1, percentageData.length]);
+    yTS.domain([Math.max(confidenceLevel-5,0), Math.min(confidenceLevel+5,100)]);
+
+    // Update the x-axis and y-axis
+    svgTS.select(".x-axis-ts").call(d3.axisBottom(xTS));
+    svgTS.select(".y-axis-ts").call(d3.axisLeft(yTS));
+
+    // Bind data and draw the line
+    svgTS.selectAll(".line-path").remove();
+    svgTS.append("path")
+        .datum(percentageData)
+        .attr("class", "line-path")
+        .attr("fill", "none")
+        .attr("stroke", "black")
+        .attr("stroke-width", 1.5)
+        .attr("d", line);
+
+    // Update the confidence level line
+    confidenceLevelLine
+        .attr("x1", 0)
+        .attr("x2", widthTS)
+        .attr("y1", yTS(confidenceLevel))
+        .attr("y2", yTS(confidenceLevel));
+}
+
 function updatePlot(mu, sigma, lower, upper, containsMu) {
     intervals.push({ lower, upper, containsMu });
 
     intervalCount++;
     if (containsMu) {
         intervalsContainingMu++;
+    } else {
+        intervalsNotContainingMu++;
     }
 
     const percentageContainingMu = ((intervalsContainingMu / intervalCount) * 100).toFixed(2);
+    const n = parseInt(document.getElementById('n').value);
+    const confidenceLevel = parseFloat(document.getElementById('confidence').value);
 
     document.getElementById('interval-count').textContent = intervalCount;
+    document.getElementById('interval-not-count').textContent = intervalsNotContainingMu;
     document.getElementById('percentage-containing-mu').textContent = percentageContainingMu;
 
-    x.domain([mu - 4 * sigma, mu + 4 * sigma]);
+    x.domain([mu - 5 * (sigma/Math.sqrt(n)), mu + 5 * (sigma/Math.sqrt(n))]);
     y.domain(intervals.map((_, i) => i));
 
     g.selectAll(".interval").remove();
@@ -158,5 +232,17 @@ function updatePlot(mu, sigma, lower, upper, containsMu) {
 
     g.append("g")
         .attr("class", "y-axis")
-        .call(d3.axisLeft(y).tickFormat(""));
+        .call(d3.axisLeft(y).tickFormat("").tickSize(0)) // Set tickSize to 0 to remove tick marks
+        .selectAll("path, line") // Select the axis path and tick lines
+        .style("opacity", 0); // Set their opacity to 0 to hide them
+
+    // Compute percentage data
+    const percentageData = intervals.map((d, idx) => {
+        const countContainingMu = intervals.slice(0, idx + 1).filter(d => d.containsMu).length;
+        return (countContainingMu / (idx + 1)) * 100;
+    });
+    console.log("Computed Percentage Data:", percentageData);
+
+    // Update the time series plot with the new percentage
+    updateTimeSeriesPlot(confidenceLevel, percentageData);
 }
