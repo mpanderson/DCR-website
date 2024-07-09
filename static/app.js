@@ -52,9 +52,7 @@ document.getElementById('reset').addEventListener('click', function() {
         .attr("class", "x-axis")
         .attr("transform", `translate(0,${height})`)
         .call(d3.axisBottom(x));
-    g.append("g")
-        .attr("class", "y-axis")
-        .call(d3.axisLeft(y).tickFormat(""));
+    
 
     // Update the vertical line position at mu
     
