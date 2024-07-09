@@ -2,34 +2,41 @@
 {% block title%}Confidence Interval{%endblock%}
 
 {% block content %}
-  <main style="font-family: Arial">
+  
     <style>
-      .container {
-          display: flex;
-      }
-        .input-column {
-            flex: 1;
-            padding: 20px;
-        }
-        .plot-column {
-            flex: 2;
-            padding: 20px;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        #plot, #time-series-plot {
+    .container {
+        display: flex;
+    }
+    .input-column {
+        flex: 1;
+        padding: 0 20px;
+        border: 1px solid #ccc;
+    }
+    .plot-column {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
             width: 100%;
-            height: 500px;
-            border: 0px solid #ccc;
-        }
+            border: 0px black solid;
+            padding: 0 20px;
+            border: 1px solid #ccc;
+            align-items: center;     /* Center children horizontally */
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    #plot {
+        width: 100%;
+        height: 200px;
+        border: 0px solid #ccc;
+        display: flex;           /* Use flexbox for the plot */
+        justify-content: center; /* Center children horizontally */
+        align-ites: center;     /* Center children horizontally */
+        padding: 0 20px;
+    }
     </style>
+     <main style="font-family: Arial">
      <center> <h2>Confidence Interval Visualization</h2></center>
-
-    <p>This page helps explain and visualize the concept of the confidence interval. </p>
-
- 
-
 
     <div class="container">
       <div class="input-column">
@@ -54,12 +61,12 @@
           <button id="reset" style="margin-bottom: 60px;">Reset</button>
           <div class="form-group">
               <label for="n_sim">Number of Simulations:</label>
-              <input type="number" id="n_sim" value="10">
+              <input type="number" id="n_sim" value="100">
           </div>
           <button id="simulate">Simulate</button>
       </div>
-      <div class="plot-column">
-            <div>
+      <div >
+            <div class="plot-column">
                   <div id="stats">
                       <p>Intervals Generated: <span id="interval-count">0</span></p>
                       <p>Intervals Not Containing μ: <span id="interval-not-count">0</span></p>
@@ -69,7 +76,7 @@
             </div>
           <div id="plot"></div>
           
-      </div>
+        </div>
     </div>
 
     <script src="https://d3js.org/d3.v6.min.js"></script>

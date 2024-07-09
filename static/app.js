@@ -32,7 +32,7 @@ document.getElementById('reset').addEventListener('click', function() {
     document.getElementById('sigma').value = 1;
     document.getElementById('n').value = 15;
     document.getElementById('confidence').value = 95;
-    document.getElementById('n_sim').value = 10;
+    document.getElementById('n_sim').value = 100;
 
     // Reset intervals and plot
     intervals = [];
@@ -57,7 +57,12 @@ document.getElementById('reset').addEventListener('click', function() {
         .call(d3.axisLeft(y).tickFormat(""));
 
     // Update the vertical line position at mu
-    muLine.attr("x1", x(0)).attr("x2", x(0));  // Assuming default mu is 0
+    
+     muLine.style("display", "none");
+
+    // Clear the time series plot
+    svgTS.selectAll(".line-path").remove();
+    
 });
 
 document.getElementById('simulate').addEventListener('click', async function() {
@@ -100,7 +105,7 @@ let intervalsNotContainingMu = 0;
 const svg = d3.select("#plot")
     .append("svg")
     .attr("width", 800)
-    .attr("height", 500);
+    .attr("height", 400);
 
 const margin = {top: 20, right: 30, bottom: 30, left: 40};
 const width = +svg.attr("width") - margin.left - margin.right;
@@ -118,14 +123,15 @@ const muLine = g.append("line")
     .attr("y1", 0)
     .attr("y2", height)
     .attr("stroke", "blue")
-    .attr("stroke-width", 2);
+    .attr("stroke-width", 2)
+    .style("display","none");
 
 
 
 // Set up dimensions and margins for the time series plot
 const marginTS = { top: 20, right: 30, bottom: 30, left: 40 };
 const widthTS = 600 - marginTS.left - marginTS.right;
-const heightTS = 300 - marginTS.top - marginTS.bottom;
+const heightTS = 150 - marginTS.top - marginTS.bottom;
 
 // Create the SVG container for the time series plot
 const svgTS = d3.select("#time-series-plot")
@@ -220,6 +226,11 @@ function updatePlot(mu, sigma, lower, upper, containsMu) {
         .attr("stroke", d => d.containsMu ? "black" : "red");
 
     // Update the vertical line position at mu
+    if (intervalCount === 0) {
+        muLine.style("display", "none");
+    } else {
+            muLine.style("display", null);
+        } 
     muLine.attr("x1", x(mu)).attr("x2", x(mu));
 
     g.selectAll(".x-axis").remove();
@@ -241,7 +252,6 @@ function updatePlot(mu, sigma, lower, upper, containsMu) {
         const countContainingMu = intervals.slice(0, idx + 1).filter(d => d.containsMu).length;
         return (countContainingMu / (idx + 1)) * 100;
     });
-    console.log("Computed Percentage Data:", percentageData);
 
     // Update the time series plot with the new percentage
     updateTimeSeriesPlot(confidenceLevel, percentageData);
