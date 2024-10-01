@@ -1,0 +1,107 @@
+{% extends "base.html"%}
+{% block title%}Confidence Interval Calculator{%endblock%}
+
+{% block content %}
+
+   
+     <main style="font-family: Arial">
+     <center> <h2>Confidence Interval Calculator</h2></center>
+
+         <head>
+             <meta charset="UTF-8">
+             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+             <title>Confidence Interval Calculator</title>
+         </head>
+         <body>
+             <h1>I'd like to compute a confidence interval for</h1>
+
+            
+             <select id="interval-type" name="interval_type" onchange="showSampleOptions()">
+                 <option value="" disabled selected>Select your option</option>
+                 <option value="mean">Mean(s)</option>
+                 <option value="proportion">Proportion(s)</option>
+                 <option value="variance">Variance(s)</option>
+             </select>
+
+             <div id="sample-options" style="display:none;">
+                
+                 <select id="sample-type" name="sample_type" onchange="showAdditionalOptions()">
+                     <option value="" disabled selected>Select your option</option>
+                     <option value="one-sample">One sample</option>
+                     <option value="two-sample">Two independent Samples</option>
+                 </select>
+             </div>
+
+             <div id="additional-options" style="display:none;">
+                 <!-- Additional options will be populated here based on the selected sample type -->
+             </div>
+
+             <button onclick="computeInterval()">Compute Confidence Interval</button>
+
+             <div id="result"></div>
+
+             <script>
+                 function showSampleOptions() {
+                     document.getElementById('sample-options').style.display = 'block';
+                 }
+
+                 function showAdditionalOptions() {
+                     const intervalType = document.getElementById('interval-type').value;
+                     const sampleType = document.getElementById('sample-type').value;
+                     let additionalHtml = '';
+
+                     if (intervalType === 'mean' && sampleType === 'one-sample') {
+                         additionalHtml = `
+                             <label>Is the population standard deviation sigma known?</label>
+                             <input type="radio" name="sigma_known" value="yes" onclick="showInputs(true)"> Yes
+                             <input type="radio" name="sigma_known" value="no" onclick="showInputs(false)"> No
+
+                             <div id="mean-inputs" style="display:none;">
+                                 <label for="mean">Mean:</label>
+                                 <input type="number" id="mean" name="mean">
+
+                                 <label for="stddev">Population Standard Deviation:</label>
+                                 <input type="number" id="stddev" name="stddev">
+
+                                 <label for="confidence-level">Confidence Level:</label>
+                                 <input type="number" id="confidence-level" name="confidence_level">
+
+                                 <label for="sample-size">Sample Size:</label>
+                                 <input type="number" id="sample-size" name="sample_size">
+                             </div>
+                         `;
+                     } 
+                     // Continue adding conditions for other cases
+
+                     document.getElementById('additional-options').innerHTML = additionalHtml;
+                     document.getElementById('additional-options').style.display = 'block';
+                 }
+
+                 function showInputs(sigmaKnown) {
+                     document.getElementById('mean-inputs').style.display = 'block';
+                 }
+
+                 function computeInterval() {
+                     const data = {
+                         interval_type: document.getElementById('interval-type').value,
+                         sample_type: document.getElementById('sample-type').value,
+                         // Continue gathering all necessary inputs
+                     };
+
+                     fetch('/compute_interval', {
+                         method: 'POST',
+                         headers: {
+                             'Content-Type': 'application/json',
+                         },
+                         body: JSON.stringify(data),
+                     })
+                     .then(response => response.json())
+                     .then(data => {
+                         document.getElementById('result').innerText = data.result;
+                     });
+                 }
+             </script>
+
+
+
+  {% endblock %}

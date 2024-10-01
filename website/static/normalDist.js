@@ -1,4 +1,3 @@
-
 function createChartNorm() {
    const ctxNorm = document.getElementById('myChartNorm').getContext('2d');
    const myChartNorm = new Chart(ctxNorm, {
@@ -34,7 +33,7 @@ function createChartNorm() {
    });
   return myChartNorm;
 }
- 
+
 function normalDistribution(mu, sd, x) {
      return jStat.normal.pdf(x, mu, sd);
  }
@@ -118,10 +117,6 @@ function normalDistribution(mu, sd, x) {
  // Filter values between lowerPercentile and upperPercentile
  const valuesInRange = distributionValuesNorm.filter(value => value >= lowerPercentile && value <= upperPercentile);
 
- 
+
  // Initial chart creation (using default values)
  updateChartNorm();
-
-
-
-

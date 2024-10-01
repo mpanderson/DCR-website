@@ -1,907 +1,551 @@
 {% extends "base.html"%}
-{% block title%}Distributions{%endblock%}
+{% block title%}Distribution Calculator{%endblock%}
 
 {% block content %}
 
 <style>
-  .distContainer {
-      display: flex;
-      flex-wrap: wrap;
-      height: 800px;
-      max-width: 100%;
-      position: relative;
-    background-color: black;
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
   }
-
-  .selectContainer {
-      width: 15%;
-      height: 100%;
-      background-color: lightgrey;
-      display: flex;
-        flex-direction: column; /* Stack items vertically */
-        align-items: center; /* Center items horizontally */
-     position: absolute;
-    padding: 3% 0% 5% 0%;
-    box-sizing: border-box;
-      
-    
+  .chart-container {
+    width: 100%;
+    height: 400px;
   }
-
-  .argsContainer {
-      flex-grow: 1;
-      height: 22%;
-      width: 85%;
-      background-color: lightgrey;
-   
-margin: top; 
-      /* margin-left: 15%; */
-    top: 0;
-    right: 0;
-     position: absolute;
-    padding: 3% 5% 5% 5%;
-    box-sizing: border-box;
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
   }
-
-  .graphContainer {
-      flex-grow: 5;
-      background-color: white;
-      height: 78%;
-      width: 85%;
-      bottom: 0;
-      right: 0;
-      position: absolute;
-    padding: 0% 5% 5% 5%;
-    box-sizing: border-box;
-     
+  .params, .compute-options {
+    flex: 1;
+    margin: 0 10px;
   }
-  .innerContainer {
-      text-align: center; /* Center the text inside the inner container */
+  .result {
+    margin-top: 20px;
+    font-weight: bold;
   }
-
-  /* Apply styles to the select element */
-  #distributionSelect {
-      width: 100%; /* Take up full width of the container */
-      font-size: 16px; /* Adjust the font size as needed */
-      padding: 10px; /* Add padding for better appearance */
-      border: 1px solid #ccc; /* Add a border */
-      border-radius: 10px; /* Add rounded corners */
-      outline: none; /* Remove the default outline */
+  input[type="number"] {
+    width: 80px;
   }
-
-  /* Media Queries for Tablet and Mobile */
-  /* @media only screen and (max-width: 768px) {
-      .selectContainer,
-      .argsContainer,
-      .graphContainer {
-          width: 100%;
-      }
-  } */
-  
 </style>
 
+<div class="container">
+    <h1>Distribution Calculator</h1>
+    <p>Visualize and compute properties of statistical distributions in real-time.</p>
 
-    <main style="font-family: Arial">
-       <center> <h2>Distributions</h2></center>
+    <div class="controls">
+        <div class="params">
+            <h3>Distribution</h3>
+            <select id="distributionSelect">
+                <option value="normal">Normal</option>
+                <option value="exponential">Exponential</option>
+                <option value="beta">Beta</option>
+                <option value="gamma">Gamma</option>
+                <option value="uniform">Uniform</option>
+                <option value="chisquare">Chi-square</option>
+                <option value="f">F</option>
+                <option value="t">Student's t</option>
+                <option value="poisson">Poisson</option>
+            </select>
+            <div id="paramInputs"></div>
+        </div>
+        <div class="compute-options">
+            <h3>Compute</h3>
+            <select id="computeType">
+                <option value="area">Area</option>
+                <option value="quantile">Quantile</option>
+                <option value="confidenceInterval">Confidence Interval</option>
+            </select>
+            <div id="computeInputs"></div>
+        </div>
+    </div>
 
-      <p>This page contains tools that help researchers with simple visualizations and calculations </p>
+    <div class="chart-container">
+        <canvas id="distributionChart"></canvas>
+    </div>
 
-      <h3><p class="separator"><a >Distribution Visualization and Calculation</a></p>
-      </h3>
-      
-      <script src="https://cdn.jsdelivr.net/npm/jstat@1.9.6/dist/jstat.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div id="result" class="result"></div>
+</div>
 
-      <div class="distContainer">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jstat@latest/dist/jstat.min.js"></script>
 
-         <div class="selectContainer">
+<script>
+let chart;
+let currentDistribution = 'normal';
 
-                  <div style="margin-bottom: 40%;">
-                    <table>
-                      <tr><td style="border: none; padding: 0px 0px 0px 10px;"><input type="radio" id="computeArea" name="computeOption" value="area">
-                      <label for="computeArea">Compute Areas</label></td></tr>
-                      <tr><td style="border: none; padding: 0px 0px 0px 10px;"><input type="radio" id="computeQuantile" name="computeOption" value="percentile">
-                      <label for="computeQuantile">Compute Quantiles</label></td></tr>
-          
-                    </table>
-                  </div>
-        
-           
-              
-                  <div class="distDropDown">
-                    <select id="distributionSelect">
-                      <option value="normal">Normal</option>
-                      <option value="exponential">Exponential</option>
-                      <option value="beta">Beta</option>
-                      <option value="gamma">Gamma</option>
-                      <option value="uniform">Uniform</option>
-                    </select>
-                  </div>
-
-                    
-
-                <!-- Radio buttons for Compute Area and Compute Percentile options -->
-               
-            </div>
-          <div class="argsContainer">
-                    <!-- Table for Compute Area options -->
-                      <table id="areaOptions" style="display: none; width: 75%; top: 50%; right: 50%;">
-                        <tr>
-                            <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="greaterThan" name="areaOption" value="greaterThan" checked></td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">Area <b>greater than</b></td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="zScoreGreaterThan" step="0.1" value="0"></td>
-                           <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
-                           <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedAreaGreaterThan"></span></td>
-                        </tr>
-    
-                        <!-- Repeat the same pattern for other rows -->
-                        <tr>
-                            <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="lessThan" name="areaOption" value="lessThan"></td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">Area <b>less than</b> </td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="zScoreLessThan" step="0.1" value="0"></td>
-                           <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                           <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedAreaLessThan"></span></td>
-                        </tr>
-                        <!-- Repeat the same pattern for other rows -->
-    
-                        <tr>
-                            <td style="border: none; padding: 0px 0px 0px 100px;">
-                                <input type="radio" id="greaterThanB" name="areaOption" value="greaterThanB">
-                            </td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">Area <b>between</b></td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">
-                                <input style="width: 80px" type="number" id="zScoreGreaterThanB" step="0.1" value="0">
-                            </td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">and</td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">
-                                <input style="width: 80px" type="number" id="zScoreLessThanB" step="0.1" value="0">
-                            </td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">
-                                <span id="computedAreaGreaterThanB"></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="border: none; padding: 0px 0px 0px 100px;">
-                                <input type="radio" id="lessThanT" name="areaOption" value="lessThanT">
-                            </td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">Area in <b>tails</b> less than</td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">
-                                <input style="width: 80px" type="number" id="zScoreLessThanT" step="0.1" value="0">
-                            </td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">or greater than</td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">
-                                <input style="width: 80px" type="number" id="zScoreGreaterThanT" step="0.1" value="0">
-                            </td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">Area:</td>
-                            <td style="border: none; padding: 0px 0px 0px 0px;">
-                                <span id="computedAreaLessThanT"></span>
-                            </td>
-                        </tr>
-                          <!-- Add more rows for other options -->
-                      </table>
-    
-    
-    
-    
-    
-                          <!-- Table for Compute Quantile options -->
-                          <table id="quantileOptions" style="display: none; width: 75%;">
-                            <tr>
-                                <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="greaterThan" name="quantileOption" value="greaterThan" checked></td>
-                              <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="areaGreaterThan" step="0.1" value="0.5"></td>
-                              <td style="border: none; padding: 0px 0px 0px 0px;">of area <b>above</b></td>
-                                
-                               <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
-                               <td style="border: none; padding: 0px 0px 0px 0px;"><span></span></td>
-                                <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
-                                <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedQuantileGreaterThan"></span></td>
-                            </tr>
-        
-                            <!-- Repeat the same pattern for other rows -->
-                            <tr>
-                                <td style="border: none; padding: 0px 0px 0px 100px;"><input type="radio" id="lessThan" name="quantileOption" value="lessThan"></td>
-                              <td style="border: none; padding: 0px 0px 0px 0px;"><input style="width: 80px" type="number" id="areaLessThan" step="0.1" value="0.5"></td>
-                              <td style="border: none; padding: 0px 0px 0px 0px;">of area <b>below</b></td>
-                                
-                               <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                               <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                                <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
-                                <td style="border: none; padding: 0px 0px 0px 0px;"><span id="computedQuantileLessThan"></span></td>
-                            </tr>
-                            <!-- Repeat the same pattern for other rows -->
-        
-                            <tr>
-                                <td style="border: none; padding: 0px 0px 0px 100px;">
-                                    <input type="radio" id="greaterThanB" name="quantileOption" value="greaterThanB">
-                                </td>
-                              <td style="border: none; padding: 0px 0px 0px 0px;">
-                                <input style="width: 80px" type="number" id="areaGreaterThanB" step="0.1" value="0.95"></td>
-                              <td style="border: none; padding: 0px 0px 0px 0px;">of area <b>between</b></td>
-                                
-                                <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                                <td style="border: none; padding: 0px 0px 0px 0px;"><span ></span></td>
-                                <td style="border: none; padding: 0px 0px 0px 0px;">Quantile:</td>
-                                <td style="border: none; padding: 0px 0px 0px 0px;">
-                                    <span id="computedQuantileGreaterThanB"></span> , <span id="computedQuantileGreaterThanB2"></span>
-                                </td>
-                            </tr>
-        
-                            <!-- Add more rows for other options -->
-                          </table>
-                    
-          </div>
-          <div class="graphContainer">
-              <div class="chartContainer">
-                  <div class="innerContainer">
-                      <h3>Normal Distribution</h3>
-                      <label for="meanInput">Mean:</label>
-                      <input type="number" id="meanInput" step="0.1" value="0" style="width: 80px">
-                      <label for="stdDevInput">Standard Deviation:</label>
-                      <input type="number" id="stdDevInput" step="0.1" value="1" min="0.001" style="width: 80px">
-
-
-
-
-
-                  </div>
-                  <canvas id="myChartNorm" ></canvas>
-              </div>
-
-            
-          </div>
-      </div>
-
-      <body1>
-        
-        
-
-        
-        <!-- Include jStat.js library -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jstat/1.7.1/jstat.min.js"></script>
-
-        <script>
-          // Function to compute area under the normal distribution curve
-          function computeNormalDistributionArea(mean, stdDev, zScore) {
-            // Using jStat library to compute the cumulative distribution function (CDF)
-            return jStat.normal.cdf(zScore, mean, stdDev);
-          }
-          // Function to compute area under the normal distribution curve
-          function computeNormalDistributionQuantile(mean, stdDev, area) {
-            // Using jStat library to compute the cumulative distribution function (CDF)
-            return jStat.normal.inv(area, mean, stdDev);
-          }
-
-          // Function to update all computed areas based on current mean and stdDev
-          function updateAllComputedAreas() {
-            // Get user inputs
-            var mean = parseFloat(document.getElementById("meanInput").value);
-            var stdDev = parseFloat(document.getElementById("stdDevInput").value);
-
-            // Update computed areas for all radio button options
-            var radioOptions = document.getElementsByName("areaOption");
-
-            for (var i = 0; i < radioOptions.length; i++) {
-              var selectedRadio = radioOptions[i].value;
-              var computedAreaElement = document.getElementById("computedArea" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1));
-
-              if (computedAreaElement) {
-                var zScore;
-                var computedArea;
-
-                // Handle special cases for "greaterThan" and "greaterThanOrEqual"
-                if (selectedRadio === "greaterThan" || selectedRadio === "greaterThanOrEqual") {
-                  zScore = parseFloat(document.getElementById("zScore" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1)).value);
-                  computedArea = computeNormalDistributionArea(mean, stdDev, zScore);
-
-                  // Adjust the computed area for "greaterThan" and "greaterThanOrEqual" options
-                  if (selectedRadio === "greaterThan" || selectedRadio === "greaterThanOrEqual") {
-                    computedArea = 1 - computedArea;
-                  }
-                  
-                }
-                  // Handle special case for "greaterThanB"
-                  else if (selectedRadio === "greaterThanB") {
-                   
-                    var zScoreGreaterThanB = parseFloat(document.getElementById("zScoreGreaterThanB").value);
-                    var zScoreLessThanB = parseFloat(document.getElementById("zScoreLessThanB").value);
-
-                    // Find the min and max values
-                    var minZScore = Math.min(zScoreGreaterThanB, zScoreLessThanB);
-                    var maxZScore = Math.max(zScoreGreaterThanB, zScoreLessThanB);
-
-                    
-                    computedArea = computeNormalDistributionArea(mean, stdDev, maxZScore) - computeNormalDistributionArea(mean, stdDev, minZScore);
-                    computedAreaElement = document.getElementById("computedAreaGreaterThanB"); // Corrected ID
-                    
-                  }
-
-                  // Handle special case for "lessThanT"
-                  else if (selectedRadio === "lessThanT") {
-                   
-                    var zScoreLessThanT = parseFloat(document.getElementById("zScoreLessThanT").value);
-                    var zScoreGreaterThanT = parseFloat(document.getElementById("zScoreGreaterThanT").value);
-
-                    // Find the min and max values
-                    var minZScore = Math.min(zScoreLessThanT, zScoreGreaterThanT);
-                    var maxZScore = Math.max(zScoreLessThanT, zScoreGreaterThanT);
-
-                    
-                    computedArea = computeNormalDistributionArea(mean, stdDev, minZScore) + (1 - computeNormalDistributionArea(mean, stdDev, maxZScore));
-                    computedAreaElement = document.getElementById("computedAreaLessThanT"); // Corrected ID
-                  
-                  }
-                // Handle other cases
-                else {
-                  zScore = parseFloat(document.getElementById("zScore" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1)).value);
-                  computedArea = computeNormalDistributionArea(mean, stdDev, zScore);
-                }
-
-                computedAreaElement.textContent = computedArea.toFixed(4); // Adjust the decimal places as needed
-              }
-            }
-          }
-
-          // Attach event listeners to radio buttons
-          var radioOptions = document.getElementsByName("areaOption");
-          for (var i = 0; i < radioOptions.length; i++) {
-            radioOptions[i].addEventListener("change", updateAllComputedAreas);
-          }
-
-          // Attach event listener to zScore input elements
-          var zScoreInputs = document.querySelectorAll('[id^="zScore"]');
-          for (var i = 0; i < zScoreInputs.length; i++) {
-            zScoreInputs[i].addEventListener("input", updateAllComputedAreas);
-          }
-
-          // Attach event listener to mean and stdDev input elements
-          var meanInput1 = document.getElementById("meanInput");
-          var stdDevInput1 = document.getElementById("stdDevInput");
-
-          meanInput1.addEventListener("input", updateAllComputedAreas);
-          stdDevInput1.addEventListener("input", updateAllComputedAreas);
-
-          // Initial update when the page loads
-          updateAllComputedAreas();
-
-          function updateAllComputedQuantiles() {
-            // Get user inputs
-            var mean = parseFloat(document.getElementById("meanInput").value);
-            var stdDev = parseFloat(document.getElementById("stdDevInput").value);
-
-            // Update computed areas for all radio button options
-            var radioOptions = document.getElementsByName("quantileOption");
-
-            for (var i = 0; i < radioOptions.length; i++) {
-              var selectedRadio = radioOptions[i].value;
-              var computedQuantileElement = document.getElementById("computedQuantile" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1));
-              var computedQuantileElement2 = document.getElementById("computedQuantile" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1));
-
-              if (computedQuantileElement) {
-                var area;
-                var computedQuantile;
-                var computedQuantile2;
-
-                // Handle special cases for "greaterThan" and "greaterThanOrEqual"
-                if (selectedRadio === "greaterThan") {
-                  area = parseFloat(document.getElementById("area" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1)).value);
-                  computedQuantile = computeNormalDistributionQuantile(mean, stdDev, 1-area);
-
-                 
-
-                }
-                  // Handle special case for "greaterThanB"
-                else if (selectedRadio === "greaterThanB") {
-                    var areaGreaterThanB = parseFloat(document.getElementById("areaGreaterThanB").value);
-
-                    // Find the min and max values
-                    var minArea = (1 - areaGreaterThanB) / 2;
-                    var maxArea = areaGreaterThanB + (1 - areaGreaterThanB) / 2;
-
-                    computedQuantile = computeNormalDistributionQuantile(mean, stdDev, minArea);
-                    computedQuantile2 = computeNormalDistributionQuantile(mean, stdDev, maxArea);
-
-                    computedQuantileElement = document.getElementById("computedQuantileGreaterThanB");
-                    computedQuantileElement2 = document.getElementById("computedQuantileGreaterThanB2"); // Corrected ID
-
-                    computedQuantileElement.textContent = computedQuantile.toFixed(4);
-                    computedQuantileElement2.textContent = computedQuantile2.toFixed(4);
-                }
-
-                  
-                // Handle other cases
-                else {
-                  area = parseFloat(document.getElementById("area" + selectedRadio.charAt(0).toUpperCase() + selectedRadio.slice(1)).value);
-                  computedQuantile = computeNormalDistributionQuantile(mean, stdDev, area);
-                }
-
-                computedQuantileElement.textContent = computedQuantile.toFixed(4); // Adjust the decimal places as needed
-              }
-            }
-          }
-
-          // Attach event listeners to radio buttons
-          var radioOptions = document.getElementsByName("quantileOption");
-          for (var i = 0; i < radioOptions.length; i++) {
-            radioOptions[i].addEventListener("change", updateAllComputedQuantiles);
-          }
-
-          // Attach event listener to zScore input elements
-          var areaInputs = document.querySelectorAll('[id^="area"]');
-          for (var i = 0; i < areaInputs.length; i++) {
-            areaInputs[i].addEventListener("input", updateAllComputedQuantiles);
-          }
-
-          // Attach event listener to mean and stdDev input elements
-          var meanInput2 = document.getElementById("meanInput");
-          var stdDevInput2 = document.getElementById("stdDevInput");
-
-          meanInput2.addEventListener("input", updateAllComputedQuantiles);
-          stdDevInput2.addEventListener("input", updateAllComputedQuantiles);
-
-          // Initial update when the page loads
-          updateAllComputedQuantiles();
-        </script>
-
-
-
-
-
-
-
-        <script>
-            function createChartNorm() {
-                const ctxNorm = document.getElementById('myChartNorm').getContext('2d');
-                const myChartNorm = new Chart(ctxNorm, {
-                    type: 'line',
-                    data: {
-                        labels: [],
-                        datasets: [{
-                            label: 'Normal Distribution',
-                            data: [],
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            fill: false,
-                            pointRadius: [0]  // Hide default points
-                        }, {
-                            label: '95% Interval',
-                            data: [],
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            fill: true,
-                            pointRadius: [0]  // Hide default points
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                type: 'linear',
-                                position: 'bottom'
-                            },
-                            y: {
-                                type: 'linear',
-                                position: 'left'
+function initializeChart() {
+    const ctx = document.getElementById('distributionChart').getContext('2d');
+    chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'Distribution',
+                borderColor: 'blue',
+                borderWidth: 2,
+                fill: false,
+                data: []
+            }, {
+                label: 'Shaded Area',
+                backgroundColor: 'rgba(255, 165, 0, 0.5)',
+                borderColor: 'transparent',
+                fill: true,
+                data: []
+            }, {
+                label: 'Boundary',
+                borderColor: 'red',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                fill: false,
+                data: []
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {type: 'linear', position: 'bottom'},
+                y: {type: 'linear', position: 'left'}
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
                             }
+                            if (context.parsed.y !== null) {
+                                label += context.parsed.x.toFixed(2) + ', ' + context.parsed.y.toFixed(4);
+                            }
+                            return label;
                         }
                     }
-                });
-                return myChartNorm;
+                }
             }
+        }
+    });
+}
 
-            // Create the chart instance
-            const myChartNorm = createChartNorm();
+function updateParamInputs() {
+    const paramInputs = document.getElementById('paramInputs');
+    paramInputs.innerHTML = '';
+    switch (currentDistribution) {
+        case 'normal':
+            paramInputs.innerHTML = `
+                Mean: <input type="number" id="mean" value="0" step="0.1"><br>
+                Std Dev: <input type="number" id="stdDev" value="1" min="0.1" step="0.1">
+            `;
+            break;
+        case 'exponential':
+            paramInputs.innerHTML = `
+                Rate: <input type="number" id="rate" value="1" min="0.1" step="0.1">
+            `;
+            break;
+        case 'beta':
+            paramInputs.innerHTML = `
+                Alpha: <input type="number" id="alpha" value="2" min="0.1" step="0.1"><br>
+                Beta: <input type="number" id="beta" value="2" min="0.1" step="0.1">
+            `;
+            break;
+        case 'gamma':
+            paramInputs.innerHTML = `
+                Shape: <input type="number" id="shape" value="2" min="0.1" step="0.1"><br>
+                Scale: <input type="number" id="scale" value="1" min="0.1" step="0.1">
+            `;
+            break;
+        case 'uniform':
+            paramInputs.innerHTML = `
+                Min: <input type="number" id="min" value="0" step="0.1"><br>
+                Max: <input type="number" id="max" value="1" step="0.1">
+            `;
+            break;
+        case 'chisquare':
+            paramInputs.innerHTML = `
+                Degrees of freedom: <input type="number" id="df" value="1" min="1" step="1">
+            `;
+            break;
+        case 'f':
+            paramInputs.innerHTML = `
+                Numerator df: <input type="number" id="dfNum" value="1" min="1" step="1"><br>
+                Denominator df: <input type="number" id="dfDenom" value="1" min="1" step="1">
+            `;
+            break;
+        case 't':
+            paramInputs.innerHTML = `
+                Degrees of freedom: <input type="number" id="df" value="10" min="1" step="1">
+            `;
+            break;
+        case 'poisson':
+            paramInputs.innerHTML = `
+                Lambda: <input type="number" id="lambda" value="5" min="0.1" step="0.1">
+            `;
+            break;
+    }
+    document.querySelectorAll('#paramInputs input').forEach(input => {
+        input.addEventListener('input', updateDistribution);
+    });
+}
 
-            
+function updateComputeInputs() {
+    const computeInputs = document.getElementById('computeInputs');
+    const computeType = document.getElementById('computeType').value;
+    if (computeType === 'area') {
+        computeInputs.innerHTML = `
+            <select id="areaType">
+                <option value="lessThan">P(X ≤ x)</option>
+                <option value="greaterThan">P(X > x)</option>
+                <option value="between">P(x₁ < X ≤ x₂)</option>
+                <option value="inTails">Area in tails</option>
+            </select>
+            <input type="number" id="x" step="0.1" value="0">
+            <input type="number" id="y" step="0.1" value="1" style="display:none;">
+        `;
+        document.getElementById('areaType').addEventListener('change', function() {
+            const showBoth = this.value === 'between' || this.value === 'inTails';
+            document.getElementById('y').style.display = showBoth ? 'inline' : 'none';
+            compute();
+        });
+    } else if (computeType === 'quantile') {
+        computeInputs.innerHTML = `
+            Probability: <input type="number" id="probability" min="0" max="1" step="0.01" value="0.5">
+        `;
+    } else if (computeType === 'confidenceInterval') {
+        computeInputs.innerHTML = `
+            Confidence Level: <input type="number" id="confidenceLevel" min="0" max="100" step="1" value="95">%
+        `;
+    }
+    document.querySelectorAll('#computeInputs input').forEach(input => {
+        input.addEventListener('input', compute);
+    });
+}
 
-            // Set up listeners for input changes
-            meanInput.addEventListener('input', updateChartNorm);
-            stdDevInput.addEventListener('input', updateChartNorm);
+function getParams() {
+    const params = {};
+    switch (currentDistribution) {
+        case 'normal':
+            params.mean = parseFloat(document.getElementById('mean').value);
+            params.stdDev = parseFloat(document.getElementById('stdDev').value);
+            break;
+        case 'exponential':
+            params.rate = parseFloat(document.getElementById('rate').value);
+            break;
+        case 'beta':
+            params.alpha = parseFloat(document.getElementById('alpha').value);
+            params.beta = parseFloat(document.getElementById('beta').value);
+            break;
+        case 'gamma':
+            params.shape = parseFloat(document.getElementById('shape').value);
+            params.scale = parseFloat(document.getElementById('scale').value);
+            break;
+        case 'uniform':
+            params.min = parseFloat(document.getElementById('min').value);
+            params.max = parseFloat(document.getElementById('max').value);
+            break;
+        case 'chisquare':
+            params.df = parseInt(document.getElementById('df').value);
+            break;
+        case 'f':
+            params.dfNum = parseInt(document.getElementById('dfNum').value);
+            params.dfDenom = parseInt(document.getElementById('dfDenom').value);
+            break;
+        case 't':
+            params.df = parseInt(document.getElementById('df').value);
+            break;
+        case 'poisson':
+            params.lambda = parseFloat(document.getElementById('lambda').value);
+            break;
+    }
+    return params;
+}
 
-            // Initial chart creation (using default values)
-            updateChartNorm();
-        </script>
-        <script>
-          function normalDistribution(mu, sd, x) {
-               return jStat.normal.pdf(x, mu, sd);
-           }
+function generateDistributionData(distribution, params) {
+    let xValues, yValues;
+    const numPoints = 200;
 
-           function generateSequenceNorm(mu, sd, numPoints) {
-               const sequence = [];
-               const lowerBound = mu - 4 * sd;
-               const upperBound = mu + 4 * sd;
-               const step = (upperBound - lowerBound) / (numPoints - 1);
+    switch(distribution) {
+        case 'normal':
+            xValues = jStat.seq(params.mean - 4*params.stdDev, params.mean + 4*params.stdDev, numPoints);
+            yValues = xValues.map(x => jStat.normal.pdf(x, params.mean, params.stdDev));
+            break;
+        case 'exponential':
+            xValues = jStat.seq(0, 5/params.rate, numPoints);
+            yValues = xValues.map(x => jStat.exponential.pdf(x, params.rate));
+            break;
+        case 'beta':
+            xValues = jStat.seq(0, 1, numPoints);
+            yValues = xValues.map(x => jStat.beta.pdf(x, params.alpha, params.beta));
+            break;
+        case 'gamma':
+            xValues = jStat.seq(0, jStat.gamma.inv(0.999, params.shape, params.scale), numPoints);
+            yValues = xValues.map(x => jStat.gamma.pdf(x, params.shape, params.scale));
+            break;
+        case 'uniform':
+            xValues = [params.min, params.max];
+            yValues = [1 / (params.max - params.min), 1 / (params.max - params.min)];
+            break;
+        case 'chisquare':
+            xValues = jStat.seq(0, jStat.chisquare.inv(0.999, params.df), numPoints);
+            yValues = xValues.map(x => jStat.chisquare.pdf(x, params.df));
+            break;
+        case 'f':
+            xValues = jStat.seq(0, jStat.centralF.inv(0.999, params.dfNum, params.dfDenom), numPoints);
+            yValues = xValues.map(x => jStat.centralF.pdf(x, params.dfNum, params.dfDenom));
+            break;
+        case 't':
+            xValues = jStat.seq(jStat.studentt.inv(0.001, params.df), jStat.studentt.inv(0.999, params.df), numPoints);
+            yValues = xValues.map(x => jStat.studentt.pdf(x, params.df));
+            break;
+        case 'poisson':
+            const maxX = Math.min(Math.ceil(params.lambda + 4 * Math.sqrt(params.lambda)), 100);
+            xValues = Array.from({length: maxX + 1}, (_, i) => i);
+            yValues = xValues.map(x => jStat.poisson.pdf(x, params.lambda));
+            break;
+    }
+    return [xValues, yValues];
+}
 
-               for (let i = 0; i < numPoints; i++) {
-                   const value = lowerBound + i * step;
-                   sequence.push(value);
-               }
-
-               return sequence;
-           }
-
-           function updateChartNorm() {
-               const meanInput = document.getElementById('meanInput');
-               const stdDevInput = document.getElementById('stdDevInput');
-
-             const computeAreaRadio = document.getElementById('computeArea');
-             const computeQuantileRadio = document.getElementById('computeQuantile');
-
-             const areaOptionsTable = document.getElementById('areaOptions');
-             const quantileOptionsTable = document.getElementById('quantileOptions');
-
-             let mean = parseFloat(meanInput.value) || 0;
-             let standardDeviation = Math.max(parseFloat(stdDevInput.value), 0.001) || 0.001;
-
-             // Ensure that stdDev is not below 0.001
-               standardDeviation = Math.max(standardDeviation, 0.001);
-
-             // Check which radio button is selected
-             if (computeAreaRadio.checked) {
-                 // Compute Area option is selected
-                 areaOptionsTable.style.display = 'table';  // Show the table of options
-                 quantileOptionsTable.style.display = 'none';
-                 // ... (your logic for computing area based on selected options and input values)
-             } else if (computeQuantileRadio.checked){
-                  // Hide the table if Compute Area is not selected
-                  quantileOptionsTable.style.display = 'table';
-                  areaOptionsTable.style.display = 'none';
-                  // ... (your logic for other options)
-              } else {
-                 // Hide the table if Compute Area is not selected
-                 areaOptionsTable.style.display = 'none';
-                 quantileOptionsTable.style.display = 'none';
-                 // ... (your logic for other options)
-             }
-
-               const generatedSequenceNorm = generateSequenceNorm(mean, standardDeviation, 1000);
-               const distributionValuesNorm = generatedSequenceNorm.map(x => normalDistribution(mean, standardDeviation, x));
-
-               const lowerPercentile = jStat.normal.inv(0.025, mean, standardDeviation);
-               const upperPercentile = jStat.normal.inv(0.975, mean, standardDeviation);
-
-               // Add points at 2.5th and 97.5th percentiles
-               const confidenceIntervalPoints = [
-                   { x: lowerPercentile, y: normalDistribution(mean, standardDeviation, lowerPercentile) },
-                   { x: upperPercentile, y: normalDistribution(mean, standardDeviation, upperPercentile) }
-               ];
-
-               // Filter values between lowerPercentile and upperPercentile
-               const valuesInRange = distributionValuesNorm.filter(value => value >= lowerPercentile && value <= upperPercentile);
-
-               myChartNorm.data.labels = generatedSequenceNorm.map(x => x.toFixed(2));
-               myChartNorm.data.datasets[0].data = distributionValuesNorm;
-               myChartNorm.data.datasets[0].pointRadius = [0];  // Hide default points
-               myChartNorm.data.datasets[0].pointBackgroundColor = ['red', 'red'];  // Color for confidence interval points
-               myChartNorm.data.datasets[0].pointBorderColor = ['red', 'red'];  // Border color for confidence interval points
-               myChartNorm.data.datasets[0].pointStyle = ['circle', 'circle'];  // Style for confidence interval points
-               myChartNorm.data.datasets[1] = {
-                   label: '95% Confidence Interval',
-                   data: confidenceIntervalPoints,
-                   pointRadius: [6, 6],  // Size of confidence interval points
-                   pointBackgroundColor: ['red', 'red'],
-                   pointBorderColor: ['red', 'red'],
-                   pointStyle: ['circle', 'circle'],
-                   showLine: false
-               };
-             myChartNorm.data.datasets[2] = {
-                  label: 'Area',
-                  data: confidenceIntervalPoints,
-                  showLine: false
-              };
-             myChartNorm.data.datasets[3] = {
-                 label: 'Area',
-                 data: confidenceIntervalPoints,
-                 showLine: false
-             };
-
-             // Get the selected radio button for area computation
-             const selectedRadio = document.querySelector('input[name="areaOption"]:checked');
-             const selectedRadioQ = document.querySelector('input[name="quantileOption"]:checked');
-             
-             // Get the zScore input values
-             const zScoreInput = document.getElementById('zScoreGreaterThan');
-             const zScore = parseFloat(zScoreInput.value) || 0;
-
-             const zScore2Input = document.getElementById('zScoreLessThan');
-             const zScore2 = parseFloat(zScore2Input.value) || 0;
-
-             const zScoreGreaterThanBInput = document.getElementById('zScoreGreaterThanB');
-             const zScoreGreaterThanB = parseFloat(zScoreGreaterThanBInput.value) || 0;
-
-             const zScoreLessThanBInput = document.getElementById('zScoreLessThanB');
-             const zScoreLessThanB = parseFloat(zScoreLessThanBInput.value) || 0;
-
-             const zScoreLessThanTInput = document.getElementById('zScoreLessThanT');
-             const zScoreLessThanT = parseFloat(zScoreLessThanTInput.value) || 0;
-
-             const zScoreGreaterThanTInput = document.getElementById('zScoreGreaterThanT');
-             const zScoreGreaterThanT = parseFloat(zScoreGreaterThanTInput.value) || 0;
-
-             const quantileGreaterThanInput = document.getElementById('computedQuantileGreaterThan');
-             const quantileGreaterThan = quantileGreaterThanInput.textConent || 0;
-
-             const quantileLessThanInput = document.getElementById('computedQuantileLessThan');
-             const quantileLessThan = quantileLessThanInput.textContent || 0;
-
-             const quantileGreaterThanBInput = document.getElementById('computedQuantileGreaterThanB');
-             const quantileGreaterThanB = quantileGreaterThanBInput.textContent || -1.96;
-
-             const quantileGreaterThanB2Input = document.getElementById('computedQuantileGreaterThanB2');
-             const quantileGreaterThanB2 = quantileGreaterThanB2Input.textContent || 1.96;
-             
-             
-
-             // Compute lower and upper bounds based on the selected radio button
-             let lowerBound, upperBound, lowerBound2, upperBound2;
-                 if (computeAreaRadio.checked) {
-                     if (selectedRadio) {
-                         const radioValue = selectedRadio.value;
-        
-                         if (radioValue === 'greaterThan') {
-                             lowerBound = zScore;
-                             upperBound = Infinity;
-                         } else if (radioValue === 'lessThan') {
-                             lowerBound = -Infinity;
-                             upperBound = zScore2;
-                         } else if (radioValue === 'greaterThanB') {
-                             lowerBound = zScoreGreaterThanB;
-                             upperBound = zScoreLessThanB;
-                         } else if (radioValue === 'lessThanT') {
-                             lowerBound = -Infinity;
-                             upperBound = zScoreLessThanT;
-                           lowerBound2 = zScoreGreaterThanT;
-                            upperBound2 = Infinity;
-                         } else {
-                             // Handle other cases as needed
-                         }
-                     }
+function updateDistribution() {
+    const params = getParams();
+    const [xValues, yValues] = generateDistributionData(currentDistribution, params);
     
-                     // Create an array to store values to be plotted
-                     const plottedValues = Array(generatedSequenceNorm.length).fill(null);
-        
-                     // Set values within the specified range
-                     distributionValuesNorm.forEach((value, index) => {
-                         const x = generatedSequenceNorm[index];
-                         if ((x >= lowerBound && x <= upperBound) || (x >= lowerBound2 && x <= upperBound2)) {
-                             plottedValues[index] = value;
-                         }
-                     });
-                     
-        
-                     // Update the chart data
-                     myChartNorm.data.labels = generatedSequenceNorm.map(x => x.toFixed(2));
-                     myChartNorm.data.datasets[2].data = plottedValues.map((y, index) => ({ x: generatedSequenceNorm[index], y }));
-                     myChartNorm.data.datasets[2].type = 'line'; // Change the type to 'line'
-                     myChartNorm.data.datasets[2].fill = 'start'; // Enable fill from the start of the line
-                     myChartNorm.data.datasets[2].borderWidth = 1; // Set borderWidth to 0 to hide the line
-                 } else if (computeQuantileRadio.checked) {
-                        if (selectedRadioQ) {
-                            const radioValue = selectedRadioQ.value;
-      
-                            if (radioValue === 'greaterThan') {
-                                lowerBound = quantileGreaterThanInput.textContent;
-                                upperBound = Infinity;
-                            } else if (radioValue === 'lessThan') {
-                                lowerBound = -Infinity;
-                                upperBound = quantileLessThanInput.textContent;
-                            } else if (radioValue === 'greaterThanB') {
-                                lowerBound = quantileGreaterThanBInput.textContent;
-                                upperBound = quantileGreaterThanB2Input.textContent;
-                            } else {
-                                // Handle other cases as needed
-                            }
-                        }
-      
-                        // Create an array to store values to be plotted
-                        const plottedValues = Array(generatedSequenceNorm.length).fill(null);
-      
-                        // Set values within the specified range
-                        distributionValuesNorm.forEach((value, index) => {
-                            const x = generatedSequenceNorm[index];
-                            if ((x >= lowerBound && x <= upperBound)) {
-                                plottedValues[index] = value;
-                            }
-                        });
-      
-      
-                        // Update the chart data
-                        myChartNorm.data.labels = generatedSequenceNorm.map(x => x.toFixed(2));
-                        myChartNorm.data.datasets[3].data = plottedValues.map((y, index) => ({ x: generatedSequenceNorm[index], y }));
-                        myChartNorm.data.datasets[3].type = 'line'; // Change the type to 'line'
-                        myChartNorm.data.datasets[3].fill = 'start'; // Enable fill from the start of the line
-                        myChartNorm.data.datasets[3].borderWidth = 1; // Set borderWidth to 0 to hide the line
-                        
-              } else {
-                 // Handle other cases as needed
-             }
-             
-               myChartNorm.update();
-             }
-
-
-          // Get the zScore input values
-           const zScoreInput = document.getElementById('zScoreGreaterThan');
-           const zScore = parseFloat(zScoreInput.value) || 0;
-
-           const zScore2Input = document.getElementById('zScoreLessThan');
-           const zScore2 = parseFloat(zScore2Input.value) || 0;
-
-           const zScoreGreaterThanBInput = document.getElementById('zScoreGreaterThanB');
-           const zScoreGreaterThanB = parseFloat(zScoreGreaterThanBInput.value) || 0;
-
-           const zScoreLessThanBInput = document.getElementById('zScoreLessThanB');
-           const zScoreLessThanB = parseFloat(zScoreLessThanBInput.value) || 0;
-
-           const zScoreLessThanTInput = document.getElementById('zScoreLessThanT');
-           const zScoreLessThanT = parseFloat(zScoreLessThanTInput.value) || 0;
-
-           const zScoreGreaterThanTInput = document.getElementById('zScoreGreaterThanT');
-           const zScoreGreaterThanT = parseFloat(zScoreGreaterThanTInput.value) || 0;
-
-           const quantileGreaterThanInput = document.getElementById('computedQuantileGreaterThan');
-           const quantileGreaterThan = quantileGreaterThanInput.textContent || 0;
-
-           const quantileLessThanInput = document.getElementById('computedQuantileLessThan');
-           const quantileLessThan = quantileLessThanInput.textContent || 0;
-
-           const quantileGreaterThanBInput = document.getElementById('computedQuantileGreaterThanB');
-           const quantileGreaterThanB = quantileGreaterThanBInput.textContent || -1.96;
-
-           const quantileGreaterThanB2Input = document.getElementById('computedQuantileGreaterThanB2');
-           const quantileGreaterThanB2 = quantileGreaterThanB2Input.textContent || 1.96;
-
-           const areaLessThanInput = document.getElementById('areaLessThan');
-           const areaLessThan = parseFloat(areaLessThanInput.value) || 0;
-
-           const areaGreaterThanInput = document.getElementById('areaGreaterThan');
-           const areaGreaterThan = parseFloat(areaGreaterThanInput.value) || -1.96;
-
-           const areaGreaterThanBInput = document.getElementById('areaGreaterThanB');
-           const areaGreaterThanB = parseFloat(areaGreaterThanBInput.value) || 1.96;
-          
-          // Add event listeners for zScore input changes
-          zScoreInput.addEventListener('input', updateChartNorm);
-          zScore2Input.addEventListener('input', updateChartNorm);
-          zScoreGreaterThanBInput.addEventListener('input', updateChartNorm);
-          zScoreLessThanBInput.addEventListener('input', updateChartNorm);
-          zScoreLessThanTInput.addEventListener('input', updateChartNorm);
-          zScoreGreaterThanTInput.addEventListener('input', updateChartNorm);
-
-          quantileGreaterThanInput.addEventListener('change', updateChartNorm);
-          quantileLessThanInput.addEventListener('change', updateChartNorm);
-          quantileGreaterThanBInput.addEventListener('change', updateChartNorm);
-          quantileGreaterThanB2Input.addEventListener('change', updateChartNorm);
-
-          areaGreaterThanInput.addEventListener('input', updateChartNorm);
-          areaLessThanInput.addEventListener('input', updateChartNorm);
-          areaGreaterThanBInput.addEventListener('input', updateChartNorm);
-          
-          
-           const meanInput = document.getElementById('meanInput');
-           const stdDevInput = document.getElementById('stdDevInput');
-
-           meanInput.addEventListener('input', updateChartNorm);
-           stdDevInput.addEventListener('input', updateChartNorm);
-
-          // Set up listeners for radio button changes
-          document.getElementById('computeArea').addEventListener('change', updateChartNorm);
-          document.getElementById('computeQuantile').addEventListener('change', updateChartNorm);
-
-          // Set up listeners for area option changes
-          document.querySelectorAll('input[name="areaOption"]').forEach(option => {
-              option.addEventListener('change', updateChartNorm);
-          });
-
-          // Set up listeners for area option changes
-          document.querySelectorAll('input[name="quantileOption"]').forEach(option => {
-              option.addEventListener('change', updateChartNorm);
-          });
-
-           const generatedSequenceNorm = generateSequenceNorm(0, 1, 1000);
-           const distributionValuesNorm = generatedSequenceNorm.map(x => normalDistribution(0, 1, x));
-
-           const lowerPercentile = jStat.normal.inv(0.025, 0, 1);
-           const upperPercentile = jStat.normal.inv(0.975, 0, 1);
-
-           // Add points at 2.5th and 97.5th percentiles
-           const confidenceIntervalPoints = [
-               { x: lowerPercentile, y: normalDistribution(0, 1, lowerPercentile) },
-               { x: upperPercentile, y: normalDistribution(0, 1, upperPercentile) }
-           ];
-
-           // Filter values between lowerPercentile and upperPercentile
-           const valuesInRange = distributionValuesNorm.filter(value => value >= lowerPercentile && value <= upperPercentile);
-
-          
-           // Initial chart creation (using default values)
-           updateChartNorm();
-
-
-        </script>
-      </body1>
-
-
-
+    chart.data.labels = xValues;
+    chart.data.datasets[0].data = yValues.map((y, i) => ({x: xValues[i], y}));
+    chart.update();
     
+    compute();
+}
 
-      <body3>
-        <div class="chartContainer">
-          <div style="align-content: inline-flex;">
-             <h3>Exponential Distribution</h3>
-            <label for="expBetaInput">Beta (scale):</label>
-            <input type="number" id="expBetaInput" step="0.1" value="1" min="0.001" style="width: 80px">
-          </div>
-          <canvas id="myChartExp"></canvas>
-        </div>
-      </body3>
+function compute() {
+    const params = getParams();
+    const computeType = document.getElementById('computeType').value;
+    let result;
 
-      <body5>
-        <div class="chartContainer">
-          <div style="align-content: inline-flex;">
-            <h3>Beta Distribution</h3>
-            <label for="betaAlphaInput">Alpha:</label>
-            <input type="number" id="betaAlphaInput" step="0.1" value="1" min="0.001" style="width: 80px">
-            <label for="betaBetaInput">Beta:</label>
-            <input type="number" id="betaBetaInput" step="0.1" value="1" min="0.001" style="width: 80px">
-          </div>
-          <canvas id="myChartBeta"></canvas>
+    if (computeType === 'area') {
+        const areaType = document.getElementById('areaType').value;
+        const x = parseFloat(document.getElementById('x').value);
+        let y;
+        if (areaType === 'between' || areaType === 'inTails') {
+            y = parseFloat(document.getElementById('y').value);
+        }
 
-        </div>
-      </body5>
+        switch(areaType) {
+            case 'lessThan':
+                result = computeCDF(currentDistribution, params, x);
+                updateShading(x, 'lessThan');
+                break;
+            case 'greaterThan':
+                result = 1 - computeCDF(currentDistribution, params, x);
+                updateShading(x, 'greaterThan');
+                break;
+            case 'between':
+                result = computeCDF(currentDistribution, params, y) - computeCDF(currentDistribution, params, x);
+                updateShading(x, 'between', y);
+                break;
+            case 'inTails':
+                result = computeCDF(currentDistribution, params, x) + (1 - computeCDF(currentDistribution, params, y));
+                updateShading(x, 'inTails', y);
+                break;
+        }
+        document.getElementById('result').textContent = `Area: ${result.toFixed(4)}`;
+    } else if (computeType === 'quantile') {
+        const probability = parseFloat(document.getElementById('probability').value);
+        result = computeQuantile(currentDistribution, params, probability);
+        updateQuantileMarker(result);
+        document.getElementById('result').textContent = `Quantile: ${result.toFixed(4)}`;
+    } else if (computeType === 'confidenceInterval') {
+        const confidenceLevel = parseFloat(document.getElementById('confidenceLevel').value) / 100;
+        const [lowerBound, upperBound] = computeConfidenceInterval(currentDistribution, params, confidenceLevel);
+        updateConfidenceIntervalShading(lowerBound, upperBound);
+        document.getElementById('result').textContent = `${confidenceLevel * 100}% Confidence Interval: (${lowerBound.toFixed(4)}, ${upperBound.toFixed(4)})`;
+    }
+}
 
-      <body4>
-        <div class="chartContainer">
-          <div style="align-content: inline-flex;">
-             <h3>Gamma Distribution</h3>
-            <label for="gamAlphaInput">Alpha:</label>
-            <input type="number" id="gamAlphaInput" step="0.1" value="1" min="0.001" style="width: 80px">
-            <label for="gamBetaInput">Beta (scale):</label>
-            <input type="number" id="gamBetaInput" step="0.1" value="1" min="0.001" style="width: 80px">
-          </div>
-          <canvas id="myChartGam"></canvas>
-        </div>
-      </body4>
+function computeCDF(distribution, params, x) {
+    switch(distribution) {
+        case 'normal':
+            return jStat.normal.cdf(x, params.mean, params.stdDev);
+        case 'exponential':
+            return jStat.exponential.cdf(x, params.rate);
+        case 'beta':
+            return jStat.beta.cdf(x, params.alpha, params.beta);
+        case 'gamma':
+            return jStat.gamma.cdf(x, params.shape, params.scale);
+        case 'uniform':
+            return jStat.uniform.cdf(x, params.min, params.max);
+        case 'chisquare':
+            return jStat.chisquare.cdf(x, params.df);
+        case 'f':
+            return jStat.centralF.cdf(x, params.dfNum, params.dfDenom);
+        case 't':
+            return jStat.studentt.cdf(x, params.df);
+        case 'poisson':
+            return jStat.poisson.cdf(Math.floor(x), params.lambda);
+    }
+}
 
-      <body6>
-        <div class="chartContainer">
-          <div style="align-content: inline-flex;">
-             <h3>Uniform Distribution</h3>
-            <label for="unifLowerInput">a:</label>
-            <input type="number" id="unifLowerInput" step="0.1" value="0" style="width: 80px">
-            <label for="unifUpperInput">b:</label>
-            <input type="number" id="unifUpperInput" step="0.1" value="1" style="width: 80px">
-          </div>
-          <canvas id="myChartUnif"></canvas>
-        </div>
-      </body6>
+function computeQuantile(distribution, params, p) {
+    switch(distribution) {
+        case 'normal':
+            return jStat.normal.inv(p, params.mean, params.stdDev);
+        case 'exponential':
+            return jStat.exponential.inv(p, params.rate);
+        case 'beta':
+            return jStat.beta.inv(p, params.alpha, params.beta);
+        case 'gamma':
+            return jStat.gamma.inv(p, params.shape, params.scale);
+        case 'uniform':
+            return jStat.uniform.inv(p, params.min, params.max);
+        case 'chisquare':
+            return jStat.chisquare.inv(p, params.df);
+        case 'f':
+            return jStat.centralF.inv(p, params.dfNum, params.dfDenom);
+        case 't':
+            return jStat.studentt.inv(p, params.df);
+        case 'poisson':
+            let x = 0;
+            while (jStat.poisson.cdf(x, params.lambda) < p) {
+                x++;
+            }
+            return x;
+    }
+}
 
+function computeConfidenceInterval(distribution, params, confidenceLevel) {
+    const alpha = 1 - confidenceLevel;
+    const lowerBound = computeQuantile(distribution, params, alpha / 2);
+    const upperBound = computeQuantile(distribution, params, 1 - alpha / 2);
+    return [lowerBound, upperBound];
+}
 
+function updateShading(x, type, y = null) {
+    const params = getParams();
+    const [xValues, yValues] = generateDistributionData(currentDistribution, params);
+    const maxY = Math.max(...yValues);
+    
+    let shadedArea = [];
+    let boundaries = [];
 
+    if (currentDistribution === 'uniform') {
+        const height = 1 / (params.max - params.min);
+        switch(type) {
+            case 'lessThan':
+                shadedArea = [
+                    {x: params.min, y: 0},
+                    {x: params.min, y: height},
+                    {x: Math.min(x, params.max), y: height},
+                    {x: Math.min(x, params.max), y: 0}
+                ];
+                boundaries = [{x: x, y: 0}, {x: x, y: height}];
+                break;
+            case 'greaterThan':
+                shadedArea = [
+                    {x: Math.max(x, params.min), y: 0},
+                    {x: Math.max(x, params.min), y: height},
+                    {x: params.max, y: height},
+                    {x: params.max, y: 0}
+                ];
+                boundaries = [{x: x, y: 0}, {x: x, y: height}];
+                break;
+            case 'between':
+                shadedArea = [
+                    {x: Math.max(x, params.min), y: 0},
+                    {x: Math.max(x, params.min), y: height},
+                    {x: Math.min(y, params.max), y: height},
+                    {x: Math.min(y, params.max), y: 0}
+                ];
+                boundaries = [{x: x, y: 0}, {x: x, y: height}, {x: y, y: 0}, {x: y, y: height}];
+                break;
+            case 'inTails':
+                shadedArea = [
+                    {x: params.min, y: 0},
+                    {x: params.min, y: height},
+                    {x: x, y: height},
+                    {x: x, y: 0},
+                    {x: y, y: 0},
+                    {x: y, y: height},
+                    {x: params.max, y: height},
+                    {x: params.max, y: 0}
+                ];
+                boundaries = [{x: x, y: 0}, {x: x, y: height}, {x: y, y: 0}, {x: y, y: height}];
+                break;
+        }
+    } else {
+        // 其他分布的处理保持不变
+        if (currentDistribution === 'poisson') {
+            x = Math.floor(x);
+            if (y !== null) y = Math.floor(y);
+        }
 
+        switch(type) {
+            case 'lessThan':
+                shadedArea = xValues.map((xi, i) => xi <= x ? {x: xi, y: yValues[i]} : null).filter(Boolean);
+                boundaries = [{x: x, y: 0}, {x: x, y: maxY}];
+                break;
+            case 'greaterThan':
+                shadedArea = xValues.map((xi, i) => xi >= x ? {x: xi, y: yValues[i]} : null).filter(Boolean);
+                boundaries = [{x: x, y: 0}, {x: x, y: maxY}];
+                break;
+            case 'between':
+                shadedArea = xValues.map((xi, i) => (xi >= x && xi <= y) ? {x: xi, y: yValues[i]} : null).filter(Boolean);
+                boundaries = [{x: x, y: 0}, {x: x, y: maxY}, {x: y, y: 0}, {x: y, y: maxY}];
+                break;
+            case 'inTails':
+                shadedArea = xValues.map((xi, i) => (xi < x || xi > y) ? {x: xi, y: yValues[i]} : {x: xi, y: 0});
+                boundaries = [{x: x, y: 0}, {x: x, y: maxY}, {x: y, y: 0}, {x: y, y: maxY}];
+                break;
+        }
+    }
 
+    chart.data.datasets[1].data = shadedArea;
+    chart.data.datasets[2].data = boundaries;
+    chart.update();
+}
 
+function updateQuantileMarker(x) {
+    const params = getParams();
+    const [xValues, yValues] = generateDistributionData(currentDistribution, params);
+    const yValue = yValues[xValues.findIndex(xi => xi >= x)];
+    
+    chart.data.datasets[1].data = [];
+    chart.data.datasets[2].data = [{x: x, y: 0}, {x: x, y: yValue}];
+    chart.update();
+}
 
+function updateConfidenceIntervalShading(lowerBound, upperBound) {
+    const params = getParams();
+    const [xValues, yValues] = generateDistributionData(currentDistribution, params);
+    
+    const shadedArea = xValues.map((xi, i) => (xi >= lowerBound && xi <= upperBound) ? {x: xi, y: yValues[i]} : {x: xi, y: 0});
+    
+    chart.data.datasets[1].data = shadedArea;
+    chart.data.datasets[2].data = [
+        {x: lowerBound, y: 0}, {x: lowerBound, y: Math.max(...yValues)},
+        {x: upperBound, y: 0}, {x: upperBound, y: Math.max(...yValues)}
+    ];
+    chart.update();
+}
 
+function initialize() {
+    initializeChart();
+    updateParamInputs();
+    updateComputeInputs();
+    updateDistribution();
 
+    document.getElementById('distributionSelect').addEventListener('change', function() {
+        currentDistribution = this.value;
+        updateParamInputs();
+        updateDistribution();
+    });
 
+    document.getElementById('computeType').addEventListener('change', function() {
+        updateComputeInputs();
+        compute();
+    });
+}
 
+window.addEventListener('load', initialize);
+</script>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-   {% endblock %}
+{% endblock %}

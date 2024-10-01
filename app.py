@@ -9,6 +9,7 @@ from flask import Flask, render_template, request, jsonify
 import numpy as np
 import scipy.stats as stats
 import random
+from scipy.stats import norm, t
 
 app = Flask(__name__, static_folder="static")
 
@@ -64,6 +65,10 @@ def randomizationspage():
 @app.route('/confidenceInterval')
 def confidenceIntervalpage():
     return render_template('confidenceInterval.html')
+
+@app.route('/confidenceIntervalCalcs')
+def confidenceIntervalCalcspage():
+    return render_template('confidenceIntervalCalcs.html')
 
 
 @app.route('/generate_sample', methods=['POST'])
@@ -165,6 +170,33 @@ def simulate():
         'stay_percentages': stay_percentages,
         'switch_percentages': switch_percentages
     })
+
+
+@app.route('/compute_interval', methods=['GET', 'POST'])
+def compute_interval():
+    data = request.json
+    interval_type = data.get('interval_type')
+    sample_type = data.get('sample_type')
+
+    if interval_type == 'mean' and sample_type == 'one-sample':
+        sigma_known = data.get('sigma_known')
+        mean = float(data.get('mean'))
+        stddev = float(data.get('stddev'))
+        confidence_level = float(data.get('confidence_level'))
+        sample_size = int(data.get('sample_size'))
+
+        alpha = 1 - confidence_level / 100
+        z = norm.ppf(1 - alpha / 2)
+        margin_of_error = z * stddev / math.sqrt(sample_size)
+
+        lower_bound = mean - margin_of_error
+        upper_bound = mean + margin_of_error
+
+        return jsonify(result=f"The confidence interval is ({lower_bound:.2f}, {upper_bound:.2f})")
+
+    # Continue handling other cases (e.g., when sigma is not known, two-sample cases, etc.)
+
+    return jsonify(result="Not implemented yet")
 
 
 if __name__ == '__main__':
