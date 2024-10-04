@@ -48,6 +48,7 @@
                 <option value="f">F</option>
                 <option value="t">Student's t</option>
                 <option value="poisson">Poisson</option>
+                <option value="binomial">Binomial</option>
             </select>
             <div id="paramInputs"></div>
         </div>
@@ -76,57 +77,58 @@
 let chart;
 let currentDistribution = 'normal';
 
-function initializeChart() {
-    const ctx = document.getElementById('distributionChart').getContext('2d');
-    chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            datasets: [{
-                label: 'Distribution',
-                borderColor: 'blue',
-                borderWidth: 2,
-                fill: false,
-                data: []
-            }, {
-                label: 'Shaded Area',
-                backgroundColor: 'rgba(255, 165, 0, 0.5)',
-                borderColor: 'transparent',
-                fill: true,
-                data: []
-            }, {
-                label: 'Boundary',
-                borderColor: 'red',
-                borderWidth: 2,
-                borderDash: [5, 5],
-                fill: false,
-                data: []
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {type: 'linear', position: 'bottom'},
-                y: {type: 'linear', position: 'left'}
+    function initializeChart() {
+        const ctx = document.getElementById('distributionChart').getContext('2d');
+
+        chart = new Chart(ctx, {
+            type: 'line',  // This will be dynamically updated
+            data: {
+                datasets: [{
+                    label: 'Distribution',
+                    borderColor: 'blue',
+                    borderWidth: 2,
+                    fill: false,
+                    data: []
+                }, {
+                    label: 'Shaded Area',
+                    backgroundColor: 'rgba(255, 165, 0, 0.5)',
+                    borderColor: 'transparent',
+                    fill: true,
+                    data: []
+                }, {
+                    label: 'Boundary',
+                    borderColor: 'red',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false,
+                    data: []
+                }]
             },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
+            options: {
+                responsive: true,
+                scales: {
+                    x: {type: 'linear', position: 'bottom'},
+                    y: {type: 'linear', position: 'left'}
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    label += context.parsed.x.toFixed(2) + ', ' + context.parsed.y.toFixed(4);
+                                }
+                                return label;
                             }
-                            if (context.parsed.y !== null) {
-                                label += context.parsed.x.toFixed(2) + ', ' + context.parsed.y.toFixed(4);
-                            }
-                            return label;
                         }
                     }
                 }
             }
-        }
-    });
-}
+        });
+    }
 
 function updateParamInputs() {
     const paramInputs = document.getElementById('paramInputs');
@@ -180,6 +182,12 @@ function updateParamInputs() {
         case 'poisson':
             paramInputs.innerHTML = `
                 Lambda: <input type="number" id="lambda" value="5" min="0.1" step="0.1">
+            `;
+            break;
+        case 'binomial':
+            paramInputs.innerHTML = `
+                n (trials): <input type="number" id="n" value="10" min="1" step="1"><br>
+                p (probability): <input type="number" id="p" value="0.5" min="0" max="1" step="0.01">
             `;
             break;
     }
@@ -256,7 +264,12 @@ function getParams() {
         case 'poisson':
             params.lambda = parseFloat(document.getElementById('lambda').value);
             break;
-    }
+        case 'binomial':
+            params.n = Math.max(1, parseInt(document.getElementById('n').value));
+            params.p = Math.min(1, Math.max(0, parseFloat(document.getElementById('p').value)));
+            console.log("Binomial params:", params);
+            break;
+}
     return params;
 }
 
@@ -302,18 +315,34 @@ function generateDistributionData(distribution, params) {
             xValues = Array.from({length: maxX + 1}, (_, i) => i);
             yValues = xValues.map(x => jStat.poisson.pdf(x, params.lambda));
             break;
-    }
+        case 'binomial':
+            console.log("Generating binomial distribution data");
+            xValues = Array.from({length: params.n + 1}, (_, i) => i);
+            yValues = xValues.map(x => {
+                let y = jStat.binomial.pdf(x, params.n, params.p);
+                console.log(`x: ${x}, y: ${y}`);
+                return y;
+            });
+            break;
+}
     return [xValues, yValues];
 }
 
 function updateDistribution() {
     const params = getParams();
     const [xValues, yValues] = generateDistributionData(currentDistribution, params);
-    
+
+    // Dynamically update chart type based on distribution
+    if (currentDistribution === 'poisson' || currentDistribution === 'binomial') {
+        chart.config.type = 'bar';  // Use bar chart for Poisson and Binomial
+    } else {
+        chart.config.type = 'line';  // Use line chart for others
+    }
+
     chart.data.labels = xValues;
     chart.data.datasets[0].data = yValues.map((y, i) => ({x: xValues[i], y}));
     chart.update();
-    
+
     compute();
 }
 
@@ -382,6 +411,8 @@ function computeCDF(distribution, params, x) {
             return jStat.studentt.cdf(x, params.df);
         case 'poisson':
             return jStat.poisson.cdf(Math.floor(x), params.lambda);
+        case 'binomial':
+            return jStat.binomial.cdf(Math.floor(x), params.n, params.p);
     }
 }
 
@@ -409,6 +440,20 @@ function computeQuantile(distribution, params, p) {
                 x++;
             }
             return x;
+        case 'binomial':
+            if (p <= 0) return 0;
+            if (p >= 1) return params.n;
+            let low = 0, high = params.n;
+            while (low < high) {
+                let mid = Math.floor((low + high) / 2);
+                if (jStat.binomial.cdf(mid, params.n, params.p) < p) {
+                    low = mid + 1;
+                } else {
+                    high = mid;
+                }
+            }
+            return low;
+        
     }
 }
 
@@ -472,8 +517,8 @@ function updateShading(x, type, y = null) {
                 break;
         }
     } else {
-        // 其他分布的处理保持不变
-        if (currentDistribution === 'poisson') {
+       
+        if (currentDistribution === 'poisson'|| currentDistribution === 'binomial') {
             x = Math.floor(x);
             if (y !== null) y = Math.floor(y);
         }
