@@ -315,7 +315,7 @@ function generateDistributionData(distribution, params) {
             yValues = xValues.map(x => jStat.studentt.pdf(x, params.df));
             break;
         case 'poisson':
-            const maxX = Math.min(Math.ceil(params.lambda + 4 * Math.sqrt(params.lambda)), 100);
+            const maxX = Math.min(Math.ceil(params.lambda + 4 * Math.sqrt(params.lambda)), 150);
             xValues = Array.from({length: maxX + 1}, (_, i) => i);
             yValues = xValues.map(x => jStat.poisson.pdf(x, params.lambda));
             break;
@@ -336,17 +336,59 @@ function updateDistribution() {
     const params = getParams();
     const [xValues, yValues] = generateDistributionData(currentDistribution, params);
 
-    // Dynamically update chart type based on distribution
     if (currentDistribution === 'poisson' || currentDistribution === 'binomial') {
-        chart.config.type = 'bar';  // Use bar chart for Poisson and Binomial
+        chart.config.type = 'bar';
+        chart.data.labels = xValues;
+        chart.data.datasets[0].data = yValues.map((y, i) => ({x: xValues[i], y}));
+        chart.options.scales.x = {
+            type: 'linear',
+            offset: true,
+            ticks: {
+                stepSize: 1,
+                callback: function(value) {
+                    if (Math.floor(value) === value) {
+                        return value;
+                    }
+                }
+            },
+            grid: {
+                offset: true
+            }
+        };
+        chart.options.barPercentage = 1.0;
+        chart.options.categoryPercentage = 0.98;
+        chart.data.datasets[0].backgroundColor = 'rgba(0, 0, 255, 0.6)';  // More opaque blue
+        chart.data.datasets[0].borderColor = 'blue';
+        chart.data.datasets[0].borderWidth = 1;
+        // Center bars on integer values
+        chart.data.datasets[0].barPercentage = 0.98;
+        chart.data.datasets[0].categoryPercentage = 1;
+        // Adjust the alignment of bars
+        chart.options.plugins.tooltip.callbacks.title = (items) => {
+            return Math.round(items[0].parsed.x);
+        };
     } else {
-        chart.config.type = 'line';  // Use line chart for others
+        chart.config.type = 'line';
+        chart.data.labels = xValues;
+        chart.data.datasets[0].data = yValues.map((y, i) => ({x: xValues[i], y}));
+        chart.options.scales.x = {
+            type: 'linear',
+            offset: false,
+            ticks: {
+                stepSize: null
+            },
+            grid: {
+                offset: false
+            }
+        };
+        chart.data.datasets[0].backgroundColor = 'transparent';
+        chart.data.datasets[0].borderColor = 'blue';
+        chart.data.datasets[0].borderWidth = 2;
+        // Reset tooltip for continuous distributions
+        chart.options.plugins.tooltip.callbacks.title = null;
     }
 
-    chart.data.labels = xValues;
-    chart.data.datasets[0].data = yValues.map((y, i) => ({x: xValues[i], y}));
     chart.update();
-
     compute();
 }
 
@@ -473,60 +515,45 @@ function updateShading(x, type, y = null) {
     const [xValues, yValues] = generateDistributionData(currentDistribution, params);
     const maxY = Math.max(...yValues);
     
-    let shadedArea = [];
     let boundaries = [];
+    let shadedArea = [];
 
-    if (currentDistribution === 'uniform') {
-        const height = 1 / (params.max - params.min);
+    if (currentDistribution === 'poisson' || currentDistribution === 'binomial') {
+        x = Math.floor(x);
+        if (y !== null) y = Math.floor(y);
+
+        // Reset all bars to blue first
+        chart.data.datasets[0].backgroundColor = Array(xValues.length).fill('rgba(0, 0, 255, 0.6)');
+
+        // Then apply shading based on type
         switch(type) {
             case 'lessThan':
-                shadedArea = [
-                    {x: params.min, y: 0},
-                    {x: params.min, y: height},
-                    {x: Math.min(x, params.max), y: height},
-                    {x: Math.min(x, params.max), y: 0}
-                ];
-                boundaries = [{x: x, y: 0}, {x: x, y: height}];
+                chart.data.datasets[0].backgroundColor = xValues.map(xi => 
+                    xi < x ? 'rgba(255, 165, 0, 0.7)' : 'rgba(0, 0, 255, 0.6)');
+                boundaries = [{x: x, y: 0}, {x: x, y: maxY}];
                 break;
             case 'greaterThan':
-                shadedArea = [
-                    {x: Math.max(x, params.min), y: 0},
-                    {x: Math.max(x, params.min), y: height},
-                    {x: params.max, y: height},
-                    {x: params.max, y: 0}
-                ];
-                boundaries = [{x: x, y: 0}, {x: x, y: height}];
+                chart.data.datasets[0].backgroundColor = xValues.map(xi => 
+                    xi > x ? 'rgba(255, 165, 0, 0.7)' : 'rgba(0, 0, 255, 0.6)');
+                boundaries = [{x: x, y: 0}, {x: x, y: maxY}];
                 break;
             case 'between':
-                shadedArea = [
-                    {x: Math.max(x, params.min), y: 0},
-                    {x: Math.max(x, params.min), y: height},
-                    {x: Math.min(y, params.max), y: height},
-                    {x: Math.min(y, params.max), y: 0}
-                ];
-                boundaries = [{x: x, y: 0}, {x: x, y: height}, {x: y, y: 0}, {x: y, y: height}];
+                chart.data.datasets[0].backgroundColor = xValues.map(xi => 
+                    (xi > x && xi <= y) ? 'rgba(255, 165, 0, 0.7)' : 'rgba(0, 0, 255, 0.6)');
+                boundaries = [{x: x, y: 0}, {x: x, y: maxY}, {x: y, y: 0}, {x: y, y: maxY}];
                 break;
             case 'inTails':
-                shadedArea = [
-                    {x: params.min, y: 0},
-                    {x: params.min, y: height},
-                    {x: x, y: height},
-                    {x: x, y: 0},
-                    {x: y, y: 0},
-                    {x: y, y: height},
-                    {x: params.max, y: height},
-                    {x: params.max, y: 0}
-                ];
-                boundaries = [{x: x, y: 0}, {x: x, y: height}, {x: y, y: 0}, {x: y, y: height}];
+                chart.data.datasets[0].backgroundColor = xValues.map(xi => 
+                    (xi <= x || xi > y) ? 'rgba(255, 165, 0, 0.7)' : 'rgba(0, 0, 255, 0.6)');
+                boundaries = [{x: x, y: 0}, {x: x, y: maxY}, {x: y, y: 0}, {x: y, y: maxY}];
                 break;
         }
+        
+        // Clear shaded area for discrete distributions
+        chart.data.datasets[1].data = [];
+        
     } else {
-       
-        if (currentDistribution === 'poisson'|| currentDistribution === 'binomial') {
-            x = Math.floor(x);
-            if (y !== null) y = Math.floor(y);
-        }
-
+        // Handle continuous distributions
         switch(type) {
             case 'lessThan':
                 shadedArea = xValues.map((xi, i) => xi <= x ? {x: xi, y: yValues[i]} : null).filter(Boolean);
@@ -541,13 +568,13 @@ function updateShading(x, type, y = null) {
                 boundaries = [{x: x, y: 0}, {x: x, y: maxY}, {x: y, y: 0}, {x: y, y: maxY}];
                 break;
             case 'inTails':
-                shadedArea = xValues.map((xi, i) => (xi < x || xi > y) ? {x: xi, y: yValues[i]} : {x: xi, y: 0});
+                shadedArea = xValues.map((xi, i) => (xi <= x || xi >= y) ? {x: xi, y: yValues[i]} : null).filter(Boolean);
                 boundaries = [{x: x, y: 0}, {x: x, y: maxY}, {x: y, y: 0}, {x: y, y: maxY}];
                 break;
         }
+        chart.data.datasets[1].data = shadedArea;
     }
 
-    chart.data.datasets[1].data = shadedArea;
     chart.data.datasets[2].data = boundaries;
     chart.update();
 }
@@ -565,14 +592,33 @@ function updateQuantileMarker(x) {
 function updateConfidenceIntervalShading(lowerBound, upperBound) {
     const params = getParams();
     const [xValues, yValues] = generateDistributionData(currentDistribution, params);
+    const maxY = Math.max(...yValues);
+
+    if (currentDistribution === 'poisson' || currentDistribution === 'binomial') {
+        // For discrete distributions, color the bars directly
+        chart.data.datasets[0].backgroundColor = xValues.map(xi => 
+            (xi >= lowerBound && xi <= upperBound) ? 'rgba(255, 165, 0, 0.7)' : 'rgba(0, 0, 255, 0.6)');
+        
+        // Clear the shaded area dataset
+        chart.data.datasets[1].data = [];
+        
+        // Set boundary lines
+        chart.data.datasets[2].data = [
+            {x: lowerBound, y: 0}, {x: lowerBound, y: maxY},
+            {x: upperBound, y: 0}, {x: upperBound, y: maxY}
+        ];
+    } else {
+        // For continuous distributions, keep existing behavior
+        const shadedArea = xValues.map((xi, i) => 
+            (xi >= lowerBound && xi <= upperBound) ? {x: xi, y: yValues[i]} : {x: xi, y: 0});
+        
+        chart.data.datasets[1].data = shadedArea;
+        chart.data.datasets[2].data = [
+            {x: lowerBound, y: 0}, {x: lowerBound, y: maxY},
+            {x: upperBound, y: 0}, {x: upperBound, y: maxY}
+        ];
+    }
     
-    const shadedArea = xValues.map((xi, i) => (xi >= lowerBound && xi <= upperBound) ? {x: xi, y: yValues[i]} : {x: xi, y: 0});
-    
-    chart.data.datasets[1].data = shadedArea;
-    chart.data.datasets[2].data = [
-        {x: lowerBound, y: 0}, {x: lowerBound, y: Math.max(...yValues)},
-        {x: upperBound, y: 0}, {x: upperBound, y: Math.max(...yValues)}
-    ];
     chart.update();
 }
 
