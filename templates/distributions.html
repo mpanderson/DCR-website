@@ -529,7 +529,7 @@ function updateShading(x, type, y = null) {
         switch(type) {
             case 'lessThan':
                 chart.data.datasets[0].backgroundColor = xValues.map(xi => 
-                    xi < x ? 'rgba(255, 165, 0, 0.7)' : 'rgba(0, 0, 255, 0.6)');
+                    xi <= x ? 'rgba(255, 165, 0, 0.7)' : 'rgba(0, 0, 255, 0.6)');
                 boundaries = [{x: x, y: 0}, {x: x, y: maxY}];
                 break;
             case 'greaterThan':
